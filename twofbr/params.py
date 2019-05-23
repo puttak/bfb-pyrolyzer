@@ -5,14 +5,11 @@ Parameters for modeling the BFB pyrolysis reactor in the NREL 2FBR system.
 # Gas
 # ----------------------------------------------------------------------------
 
-# Gas species where CH4 is methane, C2H6 is ethane, and C3H8 is propane
-gas = ['CH4', 'CO', 'CO2', 'C2H6', 'C3H8', 'H2', 'N2']
+# Gas species
+gas = ['H2', 'N2']
 
-# Gas mixtures where each item is a mixture of two gases
-mix = [('H2', 'N2'), ('CO', 'N2'), ('CO', 'N2'), ('C2H6', 'N2')]
-
-# Weights for gas mixture where each item is fraction of the two gases [-]
-wts = [(0.8, 0.2), (0.7, 0.3), (0.3, 0.7), (0.8, 0.2)]
+# Mole fractions of gas mixture [-]
+xgas = [0.85, 0.15]
 
 # Gas pressure in reactor [Pa]
 pgas = 101_325
