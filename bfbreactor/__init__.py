@@ -9,8 +9,6 @@ from .gas import GasMixture
 
 from .trans_heat_cond import hc2
 
-from .plotter import plot_gas_properties
-from .plotter import plot_mixture_properties
 from .plotter import plot_umf_zexp
 from .plotter import plot_devol_bedtemp
 from .plotter import plot_devol_diam
