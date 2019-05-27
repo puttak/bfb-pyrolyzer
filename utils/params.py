@@ -12,7 +12,7 @@ gas = ['CH4', 'CO', 'CO2', 'C2H6', 'C3H8', 'H2', 'N2']
 mix = [('H2', 'N2'), ('CO', 'N2'), ('CO', 'N2'), ('C2H6', 'N2')]
 
 # Weights for gas mixture where each item is fraction of the two gases [-]
-wts = [(0.8, 0.2), (0.7, 0.3), (0.3, 0.7), (0.8, 0.2)]
+wts = [(0.85, 0.15), (0.7, 0.3), (0.3, 0.7), (0.8, 0.2)]
 
 # Gas pressure in reactor [Pa]
 pgas = 101_325

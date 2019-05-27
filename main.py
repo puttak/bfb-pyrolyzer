@@ -1,5 +1,5 @@
 """
-here
+Main driver for BFB pyrolyzer model.
 """
 
 import argparse
@@ -15,7 +15,7 @@ from bfblib import print_parameters
 from bfblib import print_reactor
 from bfblib import print_gas
 from bfblib import print_gas_mix
-from bfblib import print_bed_particle
+from bfblib import print_bed_calcs
 
 from bfblib import save_figure
 
@@ -32,20 +32,23 @@ def main(args):
     print_reactor(rct)
 
     # Gas and Gas Mixture
-    gas_h2 = Gas(params.gas[0], params.xgas[0], params, rct)
-    gas_n2 = Gas(params.gas[1], params.xgas[1], params, rct)
+    gas_h2 = Gas(params.gas[0], params.x_gas[0], params, rct)
+    gas_n2 = Gas(params.gas[1], params.x_gas[1], params, rct)
     gas_mix = GasMix(gas_h2, gas_n2)
     print_gas(gas_h2)
     print_gas(gas_n2)
     print_gas_mix(gas_mix)
 
-    # Bed
-    bed = Bed(params, gas_mix)
-    geldart_fig = bed.geldart_fig(200, 500)
-    print_bed_particle(bed.umf, gas_h2.us)
+    # Bed Calculations
+    bed = Bed(params)
+    umf = bed.umf(gas_mix.mu_herning, gas_mix.rho)
+    zexp = bed.zexp(params.di, gas_mix.rho, umf, gas_h2.us)
+    print_bed_calcs(umf, gas_h2.us, zexp)
+
+    geldart_fig = bed.geldart_fig(gas_mix.rho, 200, 500)
     save_figure('geldart', geldart_fig, cwd)
 
-    # Feed
+    # Feed Calculations
     # stuff goes here
 
 

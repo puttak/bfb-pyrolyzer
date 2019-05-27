@@ -6,9 +6,9 @@ class Gas:
 
     def __init__(self, formula, x, params, reactor):
         self.formula = formula
-        self.press = params.pgas
-        self.q = params.qgas
-        self.temp = params.tgas
+        self.press = params.p_gas
+        self.q = params.q_gas
+        self.temp = params.t_gas
         self.x = x
         self.a_inner = reactor.a_inner
 
