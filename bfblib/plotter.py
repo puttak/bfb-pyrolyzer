@@ -4,12 +4,43 @@ import numpy as np
 import pathlib
 
 
-def _geldart_data():
+def geldart_figure(dp, rhog, rhos, dpmin=None, dpmax=None):
     """
-    Data points that form demarcation lines and regions on the Geldart chart.
-    Points are digitized from Figure 2 in Khawaja 2015.
+    Plot a point on the Geldart chart [Geldart1973]_. Data points for
+    demarcation lines and regions were digitized from [Khawaja2015]_.
+
+    Parameters
+    ----------
+    dp : float
+        Sauter mean particle diameter [µm]
+    rhog : float
+        Gas density [g/cm³]
+    rhos : float
+        Particle density [g/cm³]
+    dpmin : float, optional
+        Minimum particle size from particle size distribution [µm]
+    dpmax : float, optional
+        Max particle size from particle size distribution [µm]
+
+    Returns
+    -------
+    Matplotlib figure representing Geldart chart and user defined point.
+
+    Note
+    ----
+    Particle diameter must be in microns (µm) and density in g/cm³.
+
+    References
+    ----------
+    .. [Geldart1973] D. Geldart. Types of gas fluidization. Powder Technology,
+       7, pp. 285-292, 1973.
+    .. [Khawaja2015] H.A. Khawaja. Review of the phenomenon of fluidization
+       and its numerical modelling techniques. The International Journal of
+       Multiphysics, vol. 9, no. 4, pp. 397-407, 2015.
     """
 
+    # Data points that form demarcation lines and regions on the Geldart chart.
+    # Points are digitized from Figure 2 in Khawaja 2015.
     acx1 = [20.58, 20.77, 20.96, 20.79, 20.98, 21.17, 21.54, 22.01, 22.78,
             23.57, 24.80, 26.09, 27.80, 29.87, 32.23, 34.92, 38.16, 41.52,
             45.55, 49.98, 54.83, 60.41, 66.84, 73.95, 81.82, 86.43]
@@ -47,47 +78,10 @@ def _geldart_data():
     d_bd = np.linspace(380, 2228)
     rho_bd = (10**6) / (d_bd**2)
 
-    return d_ab, rho_ab, d_bd, rho_bd, acx, acy, aax, aay
-
-
-def geldart_figure(dp, rhog, rhos, dpmin=None, dpmax=None):
-    """
-    Plot a point on the Geldart chart [Geldart1973]_. Data points for
-    demarcation lines and regions were digitized from [Khawaja2015]_.
-
-    Parameters
-    ----------
-    dp : float
-        Sauter mean particle diameter [µm]
-    rhog : float
-        Gas density [g/cm³]
-    rhos : float
-        Particle density [g/cm³]
-    dpmin : float, optional
-        Minimum particle size from particle size distribution [µm]
-    dpmax : float, optional
-        Max particle size from particle size distribution [µm]
-
-    Returns
-    -------
-    Matplotlib figure representing Geldart chart and user defined point.
-
-    Note
-    ----
-    Particle diameter must be in microns (µm) and density in g/cm³.
-
-    References
-    ----------
-    .. [Geldart1973] D. Geldart. Types of gas fluidization. Powder Technology,
-       7, pp. 285-292, 1973.
-    .. [Khawaja2015] H.A. Khawaja. Review of the phenomenon of fluidization
-       and its numerical modelling techniques. The International Journal of
-       Multiphysics, vol. 9, no. 4, pp. 397-407, 2015.
-    """
-
-    d_ab, rho_ab, d_bd, rho_bd, acx, acy, aax, aay = _geldart_data()
+    # Density difference
     rhodiff = rhos - rhog
 
+    # Figure representing Geldart chart
     fig, ax = plt.subplots(tight_layout=True)
 
     if dpmin and dpmax is not None:

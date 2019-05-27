@@ -2,20 +2,29 @@
 Parameters for modeling the BFB pyrolysis reactor in the NREL 2FBR system.
 """
 
+# Reactor
+# ----------------------------------------------------------------------------
+
+# Inner diameter of reactor [m]
+di = 0.05232
+
 # Gas
 # ----------------------------------------------------------------------------
 
 # Gas species
 gas = ['H2', 'N2']
 
-# Mole fractions of gas mixture [-]
-xgas = [0.85, 0.15]
-
 # Gas pressure in reactor [Pa]
 pgas = 101_325
 
+# Volumetric flowrate of gas into reactor [SLM]
+qgas = 14
+
 # Gas temperature in reactor [K]
 tgas = 773.15
+
+# Mole fractions of gas mixture [-]
+xgas = [0.85, 0.15]
 
 # Feedstock
 # ----------------------------------------------------------------------------
@@ -24,7 +33,7 @@ tgas = 773.15
 # Bed
 # ----------------------------------------------------------------------------
 
-# Mean particle diameter [m], min and max particle diameter [m]
+# Mean particle diameter [m]
 dp = 0.0003
 
 # Void fraction of bed [-]
@@ -38,9 +47,3 @@ rhos = 2500
 
 # Bed height at minimum fluidization [m]
 zmf = 0.1016
-
-# Reactor
-# ----------------------------------------------------------------------------
-
-# Inner diameter of reactor [m]
-di = 0.05232

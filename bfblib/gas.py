@@ -4,11 +4,13 @@ import numpy as np
 
 class Gas:
 
-    def __init__(self, formula, press, temp, x=1):
+    def __init__(self, formula, x, params, reactor):
         self.formula = formula
-        self.press = press
-        self.temp = temp
+        self.press = params.pgas
+        self.q = params.qgas
+        self.temp = params.tgas
         self.x = x
+        self.a_inner = reactor.a_inner
 
     @property
     def mw(self):
@@ -24,6 +26,13 @@ class Gas:
     def rho(self):
         rho_gas = cm.rhog(self.mw, self.press, self.temp)
         return rho_gas
+
+    @property
+    def us(self):
+        q_lpm = cm.slm_to_lpm(self.q, self.press / 1000, self.temp)
+        q_m3s = q_lpm / 60_000
+        u_gas = q_m3s / self.a_inner
+        return u_gas
 
 
 class GasMix:

@@ -8,9 +8,11 @@ import pathlib
 
 from bfblib import Gas
 from bfblib import GasMix
-from bfblib import Particle
+from bfblib import Reactor
+from bfblib import Bed
 
-from bfblib import print_params
+from bfblib import print_parameters
+from bfblib import print_reactor
 from bfblib import print_gas
 from bfblib import print_gas_mix
 from bfblib import print_bed_particle
@@ -19,24 +21,32 @@ from bfblib import save_figure
 
 
 def main(args):
+    cwd = pathlib.Path.cwd()
+
+    # Parameters
     params = importlib.import_module(args.infile)
+    print_parameters(params)
 
-    gas_h2 = Gas(params.gas[0], params.pgas, params.tgas, params.xgas[0])
-    gas_n2 = Gas(params.gas[1], params.pgas, params.tgas, params.xgas[1])
+    # Reactor
+    rct = Reactor(params)
+    print_reactor(rct)
+
+    # Gas and Gas Mixture
+    gas_h2 = Gas(params.gas[0], params.xgas[0], params, rct)
+    gas_n2 = Gas(params.gas[1], params.xgas[1], params, rct)
     gas_mix = GasMix(gas_h2, gas_n2)
-
-    bed_particle = Particle(params.dp, params.phi, params.rhos)
-    geldart_fig = bed_particle.geldart_fig(gas_mix.rho, 200, 500)
-    umf = bed_particle.umf(params.ep, gas_mix.mu_herning, gas_mix.rho)
-
-    print_params(params)
     print_gas(gas_h2)
     print_gas(gas_n2)
     print_gas_mix(gas_mix)
-    print_bed_particle(umf)
 
-    cwd = pathlib.Path.cwd()
+    # Bed
+    bed = Bed(params, gas_mix)
+    geldart_fig = bed.geldart_fig(200, 500)
+    print_bed_particle(bed.umf, gas_h2.us)
     save_figure('geldart', geldart_fig, cwd)
+
+    # Feed
+    # stuff goes here
 
 
 if __name__ == '__main__':

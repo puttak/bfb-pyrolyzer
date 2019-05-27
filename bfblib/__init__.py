@@ -1,10 +1,12 @@
 # flake8: noqa
 
+from .bed import Bed
 from .gas import Gas
 from .gas import GasMix
-from .particle import Particle
+from .reactor import Reactor
 
-from .printer import print_params
+from .printer import print_parameters
+from .printer import print_reactor
 from .printer import print_gas
 from .printer import print_gas_mix
 from .printer import print_bed_particle
