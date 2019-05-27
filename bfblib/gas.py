@@ -28,18 +28,35 @@ class Gas:
 
 class GasMix:
 
-    def __init__(self, gases):
-        self.gases = gases
+    def __init__(self, *gas):
+        self.gases = gas
 
+    @property
     def mu_graham(self):
         mu = np.asarray([gas.mu for gas in self.gases])
         x = np.asarray([gas.x for gas in self.gases])
         mu_mix = np.sum(mu * x)
         return mu_mix
 
+    @property
     def mu_herning(self):
         mu = np.asarray([gas.mu for gas in self.gases])
         mw = np.asarray([gas.mw for gas in self.gases])
         x = np.asarray([gas.x for gas in self.gases])
         mu_mix = np.sum(mu * x * np.sqrt(mw)) / np.sum(x * np.sqrt(mw))
         return mu_mix
+
+    @property
+    def mw(self):
+        mw = np.asarray([gas.mw for gas in self.gases])
+        x = np.asarray([gas.x for gas in self.gases])
+        mw_mix = np.average(mw, weights=x)
+        return mw_mix
+
+    @property
+    def rho(self):
+        mw = self.mw
+        press = self.gases[0].press
+        temp = self.gases[0].temp
+        rho_mix = cm.rhog(mw, press, temp)
+        return rho_mix

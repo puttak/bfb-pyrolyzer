@@ -24,7 +24,7 @@ tgas = 773.15
 # Bed
 # ----------------------------------------------------------------------------
 
-# Mean particle diameter [m]
+# Mean particle diameter [m], min and max particle diameter [m]
 dp = 0.0003
 
 # Void fraction of bed [-]
@@ -44,6 +44,3 @@ zmf = 0.1016
 
 # Inner diameter of reactor [m]
 di = 0.05232
-
-# Diameter of orifice in distributor plate [m]
-dorif = 0.0008
