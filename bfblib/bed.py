@@ -4,20 +4,24 @@ from .plotter import geldart_figure
 
 class Bed:
 
-    def __init__(self, params):
+    def __init__(self, params, mug, rhog):
+        self.di = params.di
         self.dp = params.dp
         self.ep = params.ep
         self.phi = params.phi
         self.rhos = params.rhos
         self.zmf = params.zmf
+        self.mug = mug
+        self.rhog = rhog
 
-    def umf(self, mug, rhog):
-        mug = mug * 1e-7
-        umf = cm.umf_ergun(self.dp, self.ep, mug, self.phi, rhog, self.rhos)
+    @property
+    def umf(self):
+        mug = self.mug * 1e-7
+        umf = cm.umf_ergun(self.dp, self.ep, mug, self.phi, self.rhog, self.rhos)
         return umf
 
-    def zexp(self, di, rhog, umf, us):
-        fbexp = cm.fbexp(di, self.dp, rhog, self.rhos, umf, us)
+    def zexp(self, umf, us):
+        fbexp = cm.fbexp(self.di, self.dp, self.rhog, self.rhos, umf, us)
         zexp = self.zmf * fbexp
         return zexp
 

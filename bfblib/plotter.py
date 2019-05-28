@@ -6,8 +6,9 @@ import pathlib
 
 def geldart_figure(dp, rhog, rhos, dpmin=None, dpmax=None):
     """
-    Plot a point on the Geldart chart [Geldart1973]_. Data points for
-    demarcation lines and regions were digitized from [Khawaja2015]_.
+    Creata a Matplotlib figure of the Geldart chart [Geldart1973]_. Data points
+    for drawing the demarcation lines and regions were digitized from Figure 2
+    in [Khawaja2015]_.
 
     Parameters
     ----------
@@ -24,11 +25,19 @@ def geldart_figure(dp, rhog, rhos, dpmin=None, dpmax=None):
 
     Returns
     -------
-    Matplotlib figure representing Geldart chart and user defined point.
+    Matplotlib figure.
 
     Note
     ----
     Particle diameter must be in microns (µm) and density in g/cm³.
+
+    Examples
+    --------
+    For a single particle size
+    >>> geldart_figure(300, 0.1, 2.5)
+
+    For a particle size with min and max sizes
+    >>> geldart_figure(300, 0.1, 2.5, 100, 500)
 
     References
     ----------
@@ -121,7 +130,16 @@ def geldart_figure(dp, rhog, rhos, dpmin=None, dpmax=None):
 
 def save_figure(name, fig, cwd):
     """
-    here
+    Save figure as a PDF to the `results/` directory.
+
+    Parameters
+    ----------
+    name : str
+        Filename for saving plot figure.
+    fig : Matplotlib figure
+        Figure object of the plot to be saved.
+    cwd : pathlib.PosixPath
+        Path to current working directory.
     """
     results_dir = pathlib.Path(cwd, 'results')
     if not results_dir.exists():

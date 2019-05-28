@@ -20,6 +20,12 @@ rhos = 2500
 # Bed height at minimum fluidization [m]
 zmf = 0.1016
 
+# Feedstock
+# ----------------------------------------------------------------------------
+
+# Mean particle diameter of biomass feedstock [m]
+dp_feed = 0.0005
+
 # Gas
 # ----------------------------------------------------------------------------
 

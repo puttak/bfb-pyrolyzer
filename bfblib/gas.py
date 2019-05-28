@@ -4,13 +4,13 @@ import numpy as np
 
 class Gas:
 
-    def __init__(self, formula, x, params, reactor):
+    def __init__(self, formula, x_mol, params, a_inner):
         self.formula = formula
+        self.x_mol = x_mol
         self.press = params.p_gas
         self.q = params.q_gas
         self.temp = params.t_gas
-        self.x = x
-        self.a_inner = reactor.a_inner
+        self.a_inner = a_inner
 
     @property
     def mw(self):
@@ -43,7 +43,7 @@ class GasMix:
     @property
     def mu_graham(self):
         mu = np.asarray([gas.mu for gas in self.gases])
-        x = np.asarray([gas.x for gas in self.gases])
+        x = np.asarray([gas.x_mol for gas in self.gases])
         mu_mix = np.sum(mu * x)
         return mu_mix
 
@@ -51,14 +51,14 @@ class GasMix:
     def mu_herning(self):
         mu = np.asarray([gas.mu for gas in self.gases])
         mw = np.asarray([gas.mw for gas in self.gases])
-        x = np.asarray([gas.x for gas in self.gases])
+        x = np.asarray([gas.x_mol for gas in self.gases])
         mu_mix = np.sum(mu * x * np.sqrt(mw)) / np.sum(x * np.sqrt(mw))
         return mu_mix
 
     @property
     def mw(self):
         mw = np.asarray([gas.mw for gas in self.gases])
-        x = np.asarray([gas.x for gas in self.gases])
+        x = np.asarray([gas.x_mol for gas in self.gases])
         mw_mix = np.average(mw, weights=x)
         return mw_mix
 
