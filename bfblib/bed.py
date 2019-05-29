@@ -5,12 +5,12 @@ from .plotter import geldart_figure
 class Bed:
 
     def __init__(self, params, mug, rhog):
-        self.di = params.di
-        self.dp = params.dp
-        self.ep = params.ep
-        self.phi = params.phi
-        self.rhos = params.rhos
-        self.zmf = params.zmf
+        self.di = params.reactor['di']
+        self.dp = params.bed['dp_mean']
+        self.ep = params.bed['ep']
+        self.phi = params.bed['phi']
+        self.rhos = params.bed['rho']
+        self.zmf = params.bed['zmf']
         self.mug = mug
         self.rhog = rhog
 

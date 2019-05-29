@@ -5,48 +5,37 @@ Parameters for modeling the BFB pyrolysis reactor in the NREL 2FBR system.
 # Bed
 # ----------------------------------------------------------------------------
 
-# Mean particle diameter [m]
-dp = 0.0003
-
-# Void fraction of bed [-]
-ep = 0.45
-
-# Particle sphericity [-]
-phi = 0.86
-
-# Density of a bed particle [kg/m^3]
-rhos = 2500
-
-# Bed height at minimum fluidization [m]
-zmf = 0.1016
+bed = {
+    'dp_mean': 0.0003,  # Mean particle diameter [m]
+    'dp_min': 0.0002,   # Min particle diameter [m]
+    'dp_max': 0.0005,   # Max particle diameter [m]
+    'ep': 0.45,         # Void fraction of bed [-]
+    'phi': 0.86,        # Particle sphericity [-]
+    'rho': 2500,        # Density of a bed particle [kg/m³]
+    'zmf': 0.1016       # Bed height at minimum fluidization [m]
+}
 
 # Feedstock
 # ----------------------------------------------------------------------------
 
-# Mean particle diameter of biomass feedstock [m]
-dp_feed = 0.0005
+feedstock = {
+    'dp': 0.0005    # Mean particle diameter of biomass feedstock [m]
+}
 
 # Gas
 # ----------------------------------------------------------------------------
 
-# Gas species
-gas = ['H2', 'N2']
-
-# Gas pressure in reactor [Pa]
-p_gas = 101_325
-
-# Volumetric flowrate of gas into reactor [SLM]
-q_gas = 14
-
-# Gas temperature in reactor [K]
-t_gas = 773.15
-
-# Mole fractions of gas mixture [-]
-x_gas = [0.85, 0.15]
-# x_gas = [0.0, 1.0]
+gas = {
+    'species': ['H2', 'N2'],    # Gas species of each component in gas mixture [-]
+    'x': [0.85, 0.15],          # Mole fraction of each component in gas mixture [-]
+    'p': 101_325,               # Gas pressure in reactor [Pa]
+    'q': 14,                    # Volumetric flowrate of gas into reactor [SLM]
+    't': 773.15                 # Gas temperature in reactor [K]
+}
 
 # Reactor
 # ----------------------------------------------------------------------------
 
-# Inner diameter of reactor [m]
-di = 0.05232
+reactor = {
+    'di': 0.05232   # Inner diameter of reactor [m]
+}

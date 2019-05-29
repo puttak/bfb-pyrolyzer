@@ -4,7 +4,7 @@ import numpy as np
 class Reactor:
 
     def __init__(self, params):
-        self.di = params.di
+        self.di = params.reactor['di']
 
     @property
     def a_inner(self):

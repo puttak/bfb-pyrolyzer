@@ -4,22 +4,22 @@ import numpy as np
 
 class Gas:
 
-    def __init__(self, formula, x_mol, params, a_inner):
-        self.formula = formula
+    def __init__(self, species, x_mol, params, a_inner):
+        self.species = species
         self.x_mol = x_mol
-        self.press = params.p_gas
-        self.q = params.q_gas
-        self.temp = params.t_gas
+        self.press = params.gas['p']
+        self.q = params.gas['q']
+        self.temp = params.gas['t']
         self.a_inner = a_inner
 
     @property
     def mw(self):
-        mw_gas = cm.molecular_weight(self.formula)
+        mw_gas = cm.molecular_weight(self.species)
         return mw_gas
 
     @property
     def mu(self):
-        mu_gas = cm.mu_gas(self.formula, self.temp)
+        mu_gas = cm.mu_gas(self.species, self.temp)
         return mu_gas
 
     @property

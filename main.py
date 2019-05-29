@@ -23,23 +23,23 @@ def main(args):
 
     # ---------- Parameters ----------
 
-    params = importlib.import_module(args.infile)
+    pm = importlib.import_module(args.infile)
 
     # ---------- Results ----------
 
     # Reactor
-    rct = Reactor(params)
+    rct = Reactor(pm)
     a_inner = rct.a_inner
 
     # Gas H2
-    gas_h2 = Gas(params.gas[0], params.x_gas[0], params, a_inner)
+    gas_h2 = Gas(pm.gas['species'][0], pm.gas['x'][0], pm, a_inner)
     mw_h2 = gas_h2.mw
     mu_h2 = gas_h2.mu
     rho_h2 = gas_h2.rho
     us_h2 = gas_h2.us
 
     # Gas N2
-    gas_n2 = Gas(params.gas[1], params.x_gas[1], params, a_inner)
+    gas_n2 = Gas(pm.gas['species'][1], pm.gas['x'][1], pm, a_inner)
     mw_n2 = gas_n2.mw
     mu_n2 = gas_n2.mu
     rho_n2 = gas_n2.rho
@@ -53,19 +53,19 @@ def main(args):
     rho_mix = gas_mix.rho
 
     # Bed
-    bed = Bed(params, mu_herning, rho_mix)
+    bed = Bed(pm, mu_herning, rho_mix)
     geldart_fig = bed.geldart_fig(rho_mix, 200, 500)
     umf = bed.umf
     zexp = bed.zexp(umf, us_h2)
 
     # Feedstock
-    feed = Feedstock(params)
+    feed = Feedstock(pm)
     tv = feed.devol_time(gas_h2.temp)
 
-    # ---------- Print and Save ----------
+    # ---------- Print ----------
 
     # Print parameters from the `params` module
-    print_parameters(params)
+    print_parameters(pm)
 
     # Print `results` dictionary
     results = {
@@ -78,12 +78,14 @@ def main(args):
     }
     print_results(results)
 
+    # ---------- Save Figures ----------
+
     # Save plot figures to `results/` directory
     save_figure('geldart', geldart_fig, cwd)
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('infile', help='path to parameters module')
+    parser.add_argument('infile', help='path to parameters module file')
     args = parser.parse_args()
     main(args)
