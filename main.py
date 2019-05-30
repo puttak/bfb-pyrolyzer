@@ -86,6 +86,16 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('infile', help='path to parameters module file')
+    parser.add_argument('infile', nargs='?', help='path to parameters module file')
+    parser.add_argument('-c', '--clean', action='store_true', help='remove results folder')
     args = parser.parse_args()
-    main(args)
+
+    if args.infile is not None:
+        main(args)
+
+    if args.clean:
+        cwd = pathlib.Path.cwd()
+        results_dir = pathlib.Path(cwd, 'results')
+        for file in results_dir.iterdir():
+            file.unlink()
+        results_dir.rmdir()

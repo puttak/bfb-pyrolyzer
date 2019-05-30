@@ -1,5 +1,4 @@
 import chemics as cm
-from .plotter import geldart_figure
 
 
 class Bed:
@@ -30,5 +29,5 @@ class Bed:
         dp = self.dp * 1e6
         rhog = rhog / 1000
         rhos = self.rhos / 1000
-        fig = geldart_figure(dp, rhog, rhos, dpmin, dpmax)
+        fig = cm.geldart_chart(dp, rhog, rhos, dpmin, dpmax)
         return fig
