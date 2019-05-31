@@ -13,13 +13,12 @@ class Bed:
         self.mug = mug
         self.rhog = rhog
 
-    @property
-    def umf(self):
+    def calc_umf(self):
         mug = self.mug * 1e-7
         umf = cm.umf_ergun(self.dp, self.ep, mug, self.phi, self.rhog, self.rhos)
         return umf
 
-    def zexp(self, umf, us):
+    def calc_zexp(self, umf, us):
         fbexp = cm.fbexp(self.di, self.dp, self.rhog, self.rhos, umf, us)
         zexp = self.zmf * fbexp
         return zexp

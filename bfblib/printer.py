@@ -11,7 +11,7 @@ def print_parameters(pm):
     rct = pm.reactor
 
     pm_string = f"""
-    |========= Parameters =========|
+    <<<<<<<<<< Parameters >>>>>>>>>>
 
     ------------- Bed --------------\n
     {'dp_mean':12} {bed['dp_mean']} \t Mean particle diameter [m]
@@ -40,7 +40,7 @@ def print_results(results):
     """
     Printe results to console.
     """
-    a_inner = results['reactor'][0]
+    ai = results['reactor'][0]
 
     mw_h2 = results['gas_h2'][0]
     mu_h2 = results['gas_h2'][1]
@@ -63,10 +63,10 @@ def print_results(results):
     tv = results['feedstock'][0]
 
     res_string = f"""
-    |=========== Results ===========|
+    <<<<<<<<<<<< Results >>>>>>>>>>>>
 
     ------------ Reactor -----------\n
-    {'a_inner':12} {a_inner:.4f} \t Inner cross section area [m²]
+    {'ai':12} {ai:.4f} \t Inner cross section area [m²]
 
     ------------ Gas H₂ ------------\n
     {'mw':12} {mw_h2} \t Molecular weight [g/mol]

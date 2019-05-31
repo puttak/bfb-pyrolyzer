@@ -4,68 +4,49 @@ import numpy as np
 
 class Gas:
 
-    def __init__(self, species, x_mol, params, a_inner):
-        self.species = species
-        self.x_mol = x_mol
-        self.press = params.gas['p']
-        self.q = params.gas['q']
-        self.temp = params.gas['t']
-        self.a_inner = a_inner
+    def __init__(self, sp, x, p, t):
+        self.sp = sp
+        self.x = x
+        self.p = p
+        self.t = t
+        self.mw = cm.molecular_weight(sp)
 
-    @property
-    def mw(self):
-        mw_gas = cm.molecular_weight(self.species)
-        return mw_gas
-
-    @property
-    def mu(self):
-        mu_gas = cm.mu_gas(self.species, self.temp)
+    def calc_mu(self):
+        mu_gas = cm.mu_gas(self.sp, self.t)
         return mu_gas
 
-    @property
-    def rho(self):
-        rho_gas = cm.rhog(self.mw, self.press, self.temp)
+    def calc_rho(self):
+        rho_gas = cm.rhog(self.mw, self.p, self.t)
         return rho_gas
 
-    @property
-    def us(self):
-        q_lpm = cm.slm_to_lpm(self.q, self.press / 1000, self.temp)
+    def calc_us(self, a_inner, q_slm):
+        p_kPa = self.p / 1000
+        q_lpm = cm.slm_to_lpm(q_slm, p_kPa, self.t)
         q_m3s = q_lpm / 60_000
-        u_gas = q_m3s / self.a_inner
-        return u_gas
+        us_gas = q_m3s / a_inner
+        return us_gas
 
 
 class GasMix:
 
-    def __init__(self, *gas):
-        self.gases = gas
+    def __init__(self, mus, mws, xs, p, t):
+        self.mus = np.asarray(mus)
+        self.mws = np.asarray(mws)
+        self.xs = np.asarray(xs)
+        self.p = p
+        self.t = t
 
-    @property
-    def mu_graham(self):
-        mu = np.asarray([gas.mu for gas in self.gases])
-        x = np.asarray([gas.x_mol for gas in self.gases])
-        mu_mix = np.sum(mu * x)
+    def calc_mu(self, method):
+        if method == 'graham':
+            mu_mix = np.sum(self.mus * self.xs)
+        elif method == 'herning':
+            mu_mix = np.sum(self.mus * self.xs * np.sqrt(self.mws)) / np.sum(self.xs * np.sqrt(self.mws))
         return mu_mix
 
-    @property
-    def mu_herning(self):
-        mu = np.asarray([gas.mu for gas in self.gases])
-        mw = np.asarray([gas.mw for gas in self.gases])
-        x = np.asarray([gas.x_mol for gas in self.gases])
-        mu_mix = np.sum(mu * x * np.sqrt(mw)) / np.sum(x * np.sqrt(mw))
-        return mu_mix
-
-    @property
-    def mw(self):
-        mw = np.asarray([gas.mw for gas in self.gases])
-        x = np.asarray([gas.x_mol for gas in self.gases])
-        mw_mix = np.average(mw, weights=x)
+    def calc_mw(self):
+        mw_mix = np.average(self.mws, weights=self.xs)
         return mw_mix
 
-    @property
-    def rho(self):
-        mw = self.mw
-        press = self.gases[0].press
-        temp = self.gases[0].temp
-        rho_mix = cm.rhog(mw, press, temp)
+    def calc_rho(self, mw_mix):
+        rho_mix = cm.rhog(mw_mix, self.p, self.t)
         return rho_mix
