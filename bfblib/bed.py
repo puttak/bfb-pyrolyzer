@@ -6,6 +6,8 @@ class Bed:
     def __init__(self, params, mug, rhog):
         self.di = params.reactor['di']
         self.dp = params.bed['dp_mean']
+        self.dp_min = params.bed['dp_min']
+        self.dp_max = params.bed['dp_max']
         self.ep = params.bed['ep']
         self.phi = params.bed['phi']
         self.rhos = params.bed['rho']
@@ -23,9 +25,11 @@ class Bed:
         zexp = self.zmf * fbexp
         return zexp
 
-    def geldart_fig(self, rhog, dpmin, dpmax):
+    def geldart_fig(self, rhog):
         # Note that 1 m is 1e6 µm and 1 g/cm³ is 1000 kg/m³
         dp = self.dp * 1e6
+        dpmin = self.dp_min * 1e6
+        dpmax = self.dp_max * 1e6
         rhog = rhog / 1000
         rhos = self.rhos / 1000
         fig = cm.geldart_chart(dp, rhog, rhos, dpmin, dpmax)

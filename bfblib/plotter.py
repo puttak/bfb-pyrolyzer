@@ -1,20 +1,22 @@
 import pathlib
 
 
-def save_figure(name, fig, cwd):
+def save_figures(cwd, figs):
     """
-    Save figure as a PDF to the `results/` directory.
+    Save figures as a PDF to the `results` directory.
 
     Parameters
     ----------
-    name : str
-        Filename for saving plot figure.
-    fig : Matplotlib figure
-        Figure object of the plot to be saved.
     cwd : pathlib.PosixPath
         Path to current working directory.
+    figs : dict
+        Each key is used to name file. Each value is a Matplotlib figure.
     """
     results_dir = pathlib.Path(cwd, 'results')
     if not results_dir.exists():
         results_dir.mkdir()
-    fig.savefig(f'results/{name}.pdf')
+
+    for name, fig in figs.items():
+        fig.savefig(f'results/{name}.pdf')
+
+    print('Plot figures saved to `results` folder.\n')

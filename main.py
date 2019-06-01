@@ -14,18 +14,10 @@ from bfblib import Feedstock
 
 from bfblib import print_parameters
 from bfblib import print_results
+from bfblib import save_figures
 
-from bfblib import save_figure
 
-
-def main(args):
-    cwd = pathlib.Path.cwd()
-
-    # ---------- Parameters ----------
-
-    pm = importlib.import_module(args.infile)
-
-    # ---------- Results ----------
+def solve(pm):
 
     # Reactor
     rct = Reactor(pm)
@@ -54,20 +46,15 @@ def main(args):
 
     # Bed
     bed = Bed(pm, mu_herning, rho_mix)
-    geldart_fig = bed.geldart_fig(rho_mix, 200, 500)
     umf = bed.calc_umf()
     zexp = bed.calc_zexp(umf, us_h2)
+    fig_geldart = bed.geldart_fig(rho_mix)
 
     # Feedstock
     feed = Feedstock(pm)
     tv = feed.devol_time(gas_h2.t)
 
-    # ---------- Print ----------
-
-    # Print parameters from the `params` module
-    print_parameters(pm)
-
-    # Print `results` dictionary
+    # Store results from calculations
     results = {
         'reactor': [ai],
         'gas_h2': [mw_h2, mu_h2, rho_h2, us_h2],
@@ -76,26 +63,49 @@ def main(args):
         'bed': [umf, zexp],
         'feedstock': [tv]
     }
-    print_results(results)
 
-    # ---------- Save Figures ----------
+    # Store plot figures
+    figures = {
+        'geldart': fig_geldart
+    }
 
-    # Save plot figures to `results/` directory
-    save_figure('geldart', geldart_fig, cwd)
+    return results, figures
+
+
+def main(args):
+
+    # Path of current working directory
+    cwd = pathlib.Path.cwd()
+
+    # Parameters for calculations
+    pm = importlib.import_module(args.infile)
+
+    # Solve for results and figures
+    res, figs = solve(pm)
+
+    # Print parameters and results
+    print_parameters(pm)
+    print_results(res)
+
+    # Save plot figures to `results` directory
+    save_figures(cwd, figs)
 
 
 if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
-    parser.add_argument('infile', nargs='?', help='path to parameters module file')
-    parser.add_argument('-c', '--clean', action='store_true', help='remove results folder')
-    args = parser.parse_args()
 
-    if args.infile is not None:
-        main(args)
+    parser = argparse.ArgumentParser()
+    parser.add_argument('infile', help='path to parameters module file')
+    parser.add_argument('-c', '--clean', action='store_true', help='remove results folder')
+    parser.add_argument('-s', '--solve', action='store_true', help='solve for BFB pyrolyzer')
+    args = parser.parse_args()
 
     if args.clean:
         cwd = pathlib.Path.cwd()
-        results_dir = pathlib.Path(cwd, 'results')
-        for file in results_dir.iterdir():
+        resdir = pathlib.Path(cwd, 'results')
+        for file in resdir.iterdir():
             file.unlink()
-        results_dir.rmdir()
+        resdir.rmdir()
+        print('\nDeleted `results` folder.\n')
+
+    if args.solve:
+        main(args)
