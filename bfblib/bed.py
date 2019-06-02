@@ -16,6 +16,7 @@ class Bed:
         self.rhog = rhog
 
     def calc_umf(self):
+        # Conversion for kg/ms = µP * 1e-7
         mug = self.mug * 1e-7
         umf = cm.umf_ergun(self.dp, self.ep, mug, self.phi, self.rhog, self.rhos)
         return umf
@@ -26,11 +27,12 @@ class Bed:
         return zexp
 
     def geldart_fig(self, rhog):
-        # Note that 1 m is 1e6 µm and 1 g/cm³ is 1000 kg/m³
+        # Conversion for m = µm * 1e6
+        # Conversion for g/cm³ = kg/m³ * 0.001
         dp = self.dp * 1e6
         dpmin = self.dp_min * 1e6
         dpmax = self.dp_max * 1e6
-        rhog = rhog / 1000
-        rhos = self.rhos / 1000
+        rhog = rhog * 0.001
+        rhos = self.rhos * 0.001
         fig = cm.geldart_chart(dp, rhog, rhos, dpmin, dpmax)
         return fig

@@ -1,5 +1,4 @@
 import chemics as cm
-import numpy as np
 
 
 class Gas:
@@ -9,7 +8,7 @@ class Gas:
         self.x = x
         self.p = p
         self.t = t
-        self.mw = cm.molecular_weight(sp)
+        self.mw = cm.mw(sp)
 
     def calc_mu(self):
         mu_gas = cm.mu_gas(self.sp, self.t)
@@ -30,21 +29,21 @@ class Gas:
 class GasMix:
 
     def __init__(self, mus, mws, xs, p, t):
-        self.mus = np.asarray(mus)
-        self.mws = np.asarray(mws)
-        self.xs = np.asarray(xs)
+        self.mus = mus
+        self.mws = mws
+        self.xs = xs
         self.p = p
         self.t = t
 
     def calc_mu(self, method):
         if method == 'graham':
-            mu_mix = np.sum(self.mus * self.xs)
+            mu_mix = cm.mu_graham(self.mus, self.xs)
         elif method == 'herning':
-            mu_mix = np.sum(self.mus * self.xs * np.sqrt(self.mws)) / np.sum(self.xs * np.sqrt(self.mws))
+            mu_mix = cm.mu_herning(self.mus, self.mws, self.xs)
         return mu_mix
 
     def calc_mw(self):
-        mw_mix = np.average(self.mws, weights=self.xs)
+        mw_mix = cm.mw_mix(self.mws, self.xs)
         return mw_mix
 
     def calc_rho(self, mw_mix):
