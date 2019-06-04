@@ -8,4 +8,5 @@ from .reactor import Reactor
 
 from .printer import print_parameters
 from .printer import print_results
+from .plotter import plot_heat_cond
 from .plotter import save_figures

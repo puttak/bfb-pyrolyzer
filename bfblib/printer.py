@@ -60,7 +60,8 @@ def print_results(results):
     umf = results['bed'][0]
     zexp = results['bed'][1]
 
-    tv = results['feedstock'][0]
+    t_devol = results['feedstock'][0]
+    t_tinf = results['feedstock'][3]
 
     res_string = f"""
     <<<<<<<<<<<< Results >>>>>>>>>>>>
@@ -92,6 +93,7 @@ def print_results(results):
     {'zexp':12} {zexp:.2f} \t Height of expanded bed [m]
 
     ---------- Feedstock -----------\n
-    {'tv':12} {tv:.2f} \t Devolatilization time for 95% conversion [s]
+    {'t_devol':12} {t_devol:.2f} \t Devolatilization time for 95% conversion [s]
+    {'t_tinf':12} {t_tinf:.2f} \t Time for particle center to reach T∞ [s]
     """
     print(textwrap.dedent(res_string))

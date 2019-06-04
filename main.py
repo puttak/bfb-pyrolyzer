@@ -14,6 +14,7 @@ from bfblib import Feedstock
 
 from bfblib import print_parameters
 from bfblib import print_results
+from bfblib import plot_heat_cond
 from bfblib import save_figures
 
 
@@ -52,7 +53,11 @@ def solve(pm):
 
     # Feedstock
     feed = Feedstock(pm)
-    tv = feed.devol_time(gas_h2.t)
+    t_devol = feed.devol_time(gas_h2.t)
+    t_hc = feed.hc_time_vector()
+    tk_hc = feed.heat_cond(t_hc)
+    t_tinf = feed.get_time_tinf(t_hc, tk_hc)
+    fig_heatcond = plot_heat_cond(t_hc, tk_hc, t_tinf)
 
     # Store results from calculations
     results = {
@@ -61,12 +66,13 @@ def solve(pm):
         'gas_n2': [mw_n2, mu_n2, rho_n2, us_n2],
         'gas_mix': [mu_graham, mu_herning, mw_mix, rho_mix],
         'bed': [umf, zexp],
-        'feedstock': [tv]
+        'feedstock': [t_devol, t_hc, tk_hc, t_tinf]
     }
 
     # Store plot figures
     figures = {
-        'geldart': fig_geldart
+        'geldart': fig_geldart,
+        'heatcond': fig_heatcond
     }
 
     return results, figures

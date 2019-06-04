@@ -18,8 +18,18 @@ bed = {
 # Feedstock
 # ----------------------------------------------------------------------------
 
+# sg from Wood Handbook Table 4-7
+
 feedstock = {
-    'dp': 0.0005    # Mean particle diameter of biomass feedstock [m]
+    'dp': 0.0005,   # Mean particle diameter of biomass feedstock [m]
+    'h': 350,       # Heat transfer coefficient [W/m²K]
+    'k': 0.11,      # Thermal conductivity [W/mK]
+    'mc': 0,        # Moisture content [%]
+    'sg': 0.54,     # Specific gravity of loblolly pine [-]
+    'ti': 293,      # Initial particle temperature [K]
+    'tinf': 773,    # Ambient temperature [K]
+    'tmax': 6.0,    # Time duration to calculate particle temperature profile [s]
+    'm': 1000,      # Number of nodes from particle center (m=0) to surface (m)
 }
 
 # Gas
