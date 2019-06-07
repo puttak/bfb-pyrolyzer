@@ -5,7 +5,9 @@ from .trans_heat_cond import hc2
 
 class BfbModel:
 
-    def __init__(self, params):
+    def __init__(self, gas, params):
+        self.gas = gas
+
         self.di_rct = params.reactor['di']
         self.ac_rct = (np.pi * self.di_rct**2) / 4
 
@@ -37,57 +39,11 @@ class BfbModel:
         self.t_tinf = None
         self.tk_hc = None
 
-        self.fig_geldart = None
-
         self._build_t_hc()
-
-    def calc_us(self, gas):
-        p_kPa = gas.p / 1000
-        q_lpm = cm.slm_to_lpm(gas.q, p_kPa, gas.tk)
-        q_m3s = q_lpm / 60_000
-        us = q_m3s / self.ac_rct
-        self.us_bed = us
-
-    def calc_umf_ergun(self, gas, mu_option):
-        # Conversion for kg/ms = µP * 1e-7
-        if mu_option == 'graham':
-            mug = gas.mu_graham * 1e-7
-        elif mu_option == 'herning':
-            mug = gas.mu_herning * 1e-7
-        else:
-            mug = gas.mu * 1e-7
-        rhog = gas.rho
-        umf = cm.umf_ergun(self.dp_bed, self.ep_bed, mug, self.phi_bed, rhog, self.rhos_bed)
-        self.umf_ergun_bed = umf
-
-    def calc_zexp(self, gas, umf_option):
-        if umf_option == 'ergun':
-            umf = self.umf_ergun_bed
-        elif umf_option == 'wenyu':
-            umf = self.umf_wenyu_bed
-        rhog = gas.rho
-        fbexp = cm.fbexp(self.di_rct, self.dp_bed, rhog, self.rhos_bed, umf, self.us_bed)
-        zexp = self.zmf_bed * fbexp
-        self.zexp_bed = zexp
-
-    def calc_devol_time(self, gas):
-        dp = self.dp_feed * 1000
-        tv = cm.devol_time(dp, gas.tk)
-        self.tv_feed = tv
-
-    def calc_trans_hc(self, gas):
-        # Calculate temperature profiles within particle.
-        # rows = time step, columns = center to surface temperature
-        tinf = gas.tk
-        tk = hc2(self.dp_feed, self.mc_feed, self.k_feed, self.sg_feed, self.h_feed, self.ti_feed, tinf, self.b_hc, self.m_hc, self.t_hc)    # temperature array [K]
-        self.tk_hc = tk
-
-    def calc_time_to_tinf(self, gas):
-        # Determine time when particle has reached near reactor temperature.
-        tk_ref = gas.tk - 1                                 # value near reactor temperature [K]
-        idx = np.where(self.tk_hc[:, 0] > tk_ref)[0][0]     # index where T > Tinf
-        t_ref = self.t_hc[idx]                              # time where T > Tinf
-        self.t_tinf = t_ref
+        self._calc_us()
+        self._calc_devol_time()
+        self._calc_trans_hc()
+        self._calc_time_to_tinf()
 
     def _build_t_hc(self):
         # nt is number of time steps
@@ -95,13 +51,50 @@ class BfbModel:
         t = np.arange(0, self.tmax_hc + dt, dt)    # time vector [s]
         self.t_hc = t
 
-    def build_geldart_figure(self, gas):
-        # Conversion for m = µm * 1e6
-        # Conversion for g/cm³ = kg/m³ * 0.001
-        dp = self.dp_bed * 1e6
-        dpmin = self.dp_min_bed * 1e6
-        dpmax = self.dp_max_bed * 1e6
-        rhog = gas.rho * 0.001
-        rhos = self.rhos_bed * 0.001
-        fig = cm.geldart_chart(dp, rhog, rhos, dpmin, dpmax)
-        self.fig_geldart = fig
+    def _calc_us(self):
+        p_kPa = self.gas.p / 1000
+        q_lpm = cm.slm_to_lpm(self.gas.q, p_kPa, self.gas.tk)
+        q_m3s = q_lpm / 60_000
+        us = q_m3s / self.ac_rct
+        self.us_bed = us
+
+    def _calc_devol_time(self):
+        dp = self.dp_feed * 1000
+        tv = cm.devol_time(dp, self.gas.tk)
+        self.tv_feed = tv
+
+    def _calc_trans_hc(self):
+        # Calculate temperature profiles within particle.
+        # rows = time step, columns = center to surface temperature
+        tinf = self.gas.tk
+        tk = hc2(self.dp_feed, self.mc_feed, self.k_feed, self.sg_feed, self.h_feed, self.ti_feed, tinf, self.b_hc, self.m_hc, self.t_hc)    # temperature array [K]
+        self.tk_hc = tk
+
+    def _calc_time_to_tinf(self):
+        # Determine time when particle has reached near reactor temperature.
+        tk_ref = self.gas.tk - 1                            # value near reactor temperature [K]
+        idx = np.where(self.tk_hc[:, 0] > tk_ref)[0][0]     # index where T > Tinf
+        t_ref = self.t_hc[idx]                              # time where T > Tinf
+        self.t_tinf = t_ref
+
+    def calc_umf_ergun(self, mu_option):
+        # Conversion for kg/ms = µP * 1e-7
+        if mu_option == 'graham':
+            mug = self.gas.mu_graham * 1e-7
+        elif mu_option == 'herning':
+            mug = self.gas.mu_herning * 1e-7
+        else:
+            mug = self.gas.mu * 1e-7
+        rhog = self.gas.rho
+        umf = cm.umf_ergun(self.dp_bed, self.ep_bed, mug, self.phi_bed, rhog, self.rhos_bed)
+        self.umf_ergun_bed = umf
+
+    def calc_zexp(self, umf_option):
+        if umf_option == 'ergun':
+            umf = self.umf_ergun_bed
+        elif umf_option == 'wenyu':
+            umf = self.umf_wenyu_bed
+        rhog = self.gas.rho
+        fbexp = cm.fbexp(self.di_rct, self.dp_bed, rhog, self.rhos_bed, umf, self.us_bed)
+        zexp = self.zmf_bed * fbexp
+        self.zexp_bed = zexp

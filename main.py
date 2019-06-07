@@ -12,6 +12,7 @@ from bfblib import BfbModel
 
 from bfblib import print_parameters
 from bfblib import print_results
+from bfblib import plot_geldart
 from bfblib import plot_heat_cond
 from bfblib import save_figures
 
@@ -29,14 +30,12 @@ def solve(pm):
     gas_mix = GasMix(mus, mws, xs, pm.gas['p'], pm.gas['q'], pm.gas['tk'])
 
     # BFB model
-    bfb = BfbModel(pm)
-    bfb.calc_us(gas_mix)
-    bfb.calc_umf_ergun(gas_mix, 'herning')
-    bfb.calc_zexp(gas_mix, 'ergun')
-    bfb.calc_devol_time(gas_mix)
-    bfb.calc_trans_hc(gas_mix)
-    bfb.calc_time_to_tinf(gas_mix)
-    bfb.build_geldart_figure(gas_mix)
+    bfb = BfbModel(gas_mix, pm)
+    bfb.calc_umf_ergun('herning')
+    bfb.calc_zexp('ergun')
+
+    # Matplotlib figures
+    fig_geldart = plot_geldart(bfb, gas_mix)
     fig_heatcond = plot_heat_cond(bfb)
 
     # Store results from calculations
@@ -51,7 +50,7 @@ def solve(pm):
 
     # Store plot figures
     figures = {
-        'geldart': bfb.fig_geldart,
+        'geldart': fig_geldart,
         'heatcond': fig_heatcond
     }
 

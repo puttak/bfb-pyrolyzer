@@ -1,5 +1,18 @@
+import chemics as cm
 import matplotlib.pyplot as plt
 import pathlib
+
+
+def plot_geldart(bfb, gas):
+    # Conversion for m = µm * 1e6
+    # Conversion for g/cm³ = kg/m³ * 0.001
+    dp = bfb.dp_bed * 1e6
+    dpmin = bfb.dp_min_bed * 1e6
+    dpmax = bfb.dp_max_bed * 1e6
+    rhog = gas.rho * 0.001
+    rhos = bfb.rhos_bed * 0.001
+    fig = cm.geldart_chart(dp, rhog, rhos, dpmin, dpmax)
+    return fig
 
 
 def plot_heat_cond(bfb):
