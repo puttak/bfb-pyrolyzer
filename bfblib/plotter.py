@@ -2,14 +2,14 @@ import matplotlib.pyplot as plt
 import pathlib
 
 
-def plot_heat_cond(t, tk, t_tinf):
+def plot_heat_cond(bfb):
     """
     here
     """
     fig, ax = plt.subplots(tight_layout=True)
-    ax.plot(t, tk[:, 0], lw=2, label='center')
-    ax.plot(t, tk[:, -1], lw=2, label='surface')
-    ax.axvline(t_tinf, alpha=0.5, c='k', ls='--', label='tinf')
+    ax.plot(bfb.t_hc, bfb.tk_hc[:, 0], lw=2, label='center')
+    ax.plot(bfb.t_hc, bfb.tk_hc[:, -1], lw=2, label='surface')
+    ax.axvline(bfb.t_tinf, alpha=0.5, c='k', ls='--', label='tinf')
     ax.set_xlabel('Time [s]')
     ax.set_ylabel('Temperature [K]')
     ax.grid(color='0.9')

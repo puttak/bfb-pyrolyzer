@@ -6,32 +6,32 @@ def print_parameters(pm):
     Print parameter names, values, and descriptions to console.
     """
     bed = pm.bed
-    feed = pm.feedstock
+    feed = pm.feed
     gas = pm.gas
-    rct = pm.reactor
+    reactor = pm.reactor
 
     pm_string = f"""
     <<<<<<<<<< Parameters >>>>>>>>>>
 
     ------------- Bed --------------\n
-    {'dp_mean':12} {bed['dp_mean']} \t Mean particle diameter [m]
+    {'dp_mean':12} {bed['dps'][0]} \t Mean particle diameter [m]
     {'ep':12} {bed['ep']} \t Void fraction of bed [-]
     {'phi':12} {bed['phi']} \t Particle sphericity [-]
-    {'rhos':12} {bed['rho']} \t Density of a bed particle [kg/m³]
+    {'rhos':12} {bed['rhos']} \t Density of a bed particle [kg/m³]
     {'zmf':12} {bed['zmf']} \t Bed height at minimum fluidization [m]
 
     ---------- Feedstock -----------\n
-    {'dp':12} {feed['dp']} \t Mean particle diameter of biomass feedstock [m]
+    {'dp_mean':12} {feed['dp_mean']} \t Mean particle diameter of biomass feedstock [m]
 
     ------------- Gas --------------\n
-    {'species':12} {', '.join(gas['species'])} \t Components of gas mixture
+    {'sp':12} {', '.join(gas['sp'])} \t Components of gas mixture
     {'p':12} {gas['p']:,} \t Gas pressure in reactor [Pa]
     {'q':12} {gas['q']} \t Volumetric flowrate of gas into reactor [SLM]
-    {'t':12} {gas['t']} \t Gas temperature in reactor [K]
+    {'tk':12} {gas['tk']} \t Gas temperature in reactor [K]
     {'x':12} {', '.join([str(x) for x in gas['x']])}  Mole fractions of gas mixture [-]
 
     ------------ Reactor -----------\n
-    {'di':12} {rct['di']} \t Inner diameter of reactor [m]
+    {'di':12} {reactor['di']} \t Inner diameter of reactor [m]
     """
     print(textwrap.dedent(pm_string))
 

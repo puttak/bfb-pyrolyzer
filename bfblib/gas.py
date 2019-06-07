@@ -3,49 +3,40 @@ import chemics as cm
 
 class Gas:
 
-    def __init__(self, sp, x, p, t):
+    def __init__(self, sp, x, p, q, tk):
         self.sp = sp
         self.x = x
         self.p = p
-        self.t = t
-        self.mw = cm.mw(sp)
+        self.q = q
+        self.tk = tk
+        self.mw = None
+        self.mu = None
+        self.rho = None
+        self._calc_properties()
 
-    def calc_mu(self):
-        mu_gas = cm.mu_gas(self.sp, self.t)
-        return mu_gas
-
-    def calc_rho(self):
-        rho_gas = cm.rhog(self.mw, self.p, self.t)
-        return rho_gas
-
-    def calc_us(self, a_inner, q_slm):
-        p_kPa = self.p / 1000
-        q_lpm = cm.slm_to_lpm(q_slm, p_kPa, self.t)
-        q_m3s = q_lpm / 60_000
-        us_gas = q_m3s / a_inner
-        return us_gas
+    def _calc_properties(self):
+        self.mw = cm.mw(self.sp)
+        self.mu = cm.mu_gas(self.sp, self.tk)
+        self.rho = cm.rhog(self.mw, self.p, self.tk)
 
 
 class GasMix:
 
-    def __init__(self, mus, mws, xs, p, t):
+    def __init__(self, mus, mws, xs, p, q, tk):
         self.mus = mus
         self.mws = mws
         self.xs = xs
         self.p = p
-        self.t = t
+        self.q = q
+        self.tk = tk
+        self.mu_graham = None
+        self.mu_herning = None
+        self.mw = None
+        self.rho = None
+        self._calc_properties()
 
-    def calc_mu(self, method):
-        if method == 'graham':
-            mu_mix = cm.mu_graham(self.mus, self.xs)
-        elif method == 'herning':
-            mu_mix = cm.mu_herning(self.mus, self.mws, self.xs)
-        return mu_mix
-
-    def calc_mw(self):
-        mw_mix = cm.mw_mix(self.mws, self.xs)
-        return mw_mix
-
-    def calc_rho(self, mw_mix):
-        rho_mix = cm.rhog(mw_mix, self.p, self.t)
-        return rho_mix
+    def _calc_properties(self):
+        self.mw = cm.mw_mix(self.mws, self.xs)
+        self.mu_graham = cm.mu_graham(self.mus, self.xs)
+        self.mu_herning = cm.mu_herning(self.mus, self.mws, self.xs)
+        self.rho = cm.rhog(self.mw, self.p, self.tk)
