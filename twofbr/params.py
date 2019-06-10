@@ -46,6 +46,8 @@ gas = {
     'tk': 773.15,           # Gas temperature in reactor [K]
     'sp': ['H2', 'N2'],     # Gas species of each component in gas mixture [-]
     'x': [0.85, 0.15],      # Mole fraction of each component in gas mixture [-]
+    # 'sp': ['N2'],     # Gas species of each component in gas mixture [-]
+    # 'x': [1.0],      # Mole fraction of each component in gas mixture [-]
 }
 
 # Reactor Geometry

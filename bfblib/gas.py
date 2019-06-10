@@ -3,12 +3,12 @@ import chemics as cm
 
 class Gas:
 
-    def __init__(self, sp, x, p, q, tk):
+    def __init__(self, sp, x, params):
         self.sp = sp
         self.x = x
-        self.p = p
-        self.q = q
-        self.tk = tk
+        self.p = params.gas['p']
+        self.q = params.gas['q']
+        self.tk = params.gas['tk']
         self.mw = None
         self.mu = None
         self.rho = None
@@ -22,13 +22,14 @@ class Gas:
 
 class GasMix:
 
-    def __init__(self, mus, mws, xs, p, q, tk):
+    def __init__(self, sp, mus, mws, xs, params):
+        self.sp = sp
         self.mus = mus
         self.mws = mws
         self.xs = xs
-        self.p = p
-        self.q = q
-        self.tk = tk
+        self.p = params.gas['p']
+        self.q = params.gas['q']
+        self.tk = params.gas['tk']
         self.mu_graham = None
         self.mu_herning = None
         self.mw = None

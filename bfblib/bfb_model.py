@@ -7,94 +7,154 @@ class BfbModel:
 
     def __init__(self, gas, params):
         self.gas = gas
+        self.params = params
 
-        self.di_rct = params.reactor['di']
-        self.ac_rct = (np.pi * self.di_rct**2) / 4
+    """
+    Fluidization methods.
+    """
 
-        self.dp_bed = params.bed['dps'][0]
-        self.dp_min_bed = params.bed['dps'][1]
-        self.dp_max_bed = params.bed['dps'][2]
-        self.ep_bed = params.bed['ep']
-        self.phi_bed = params.bed['phi']
-        self.rhos_bed = params.bed['rhos']
-        self.zmf_bed = params.bed['zmf']
-        self.us_bed = None
-        self.umf_ergun_bed = None
-        self.umf_wenyu_bed = None
-        self.zexp_bed = None
+    def calc_inner_ac(self):
+        """
+        Returns
+        -------
+        ac : float
+            Inner cross section area of the rector [m²]
+        """
+        di = self.params.reactor['di']
+        ac = (np.pi * di**2) / 4
+        return ac
 
-        self.dp_feed = params.feed['dp_mean']
-        self.h_feed = params.feed['h']
-        self.mc_feed = params.feed['mc']
-        self.k_feed = params.feed['k']
-        self.sg_feed = params.feed['sg']
-        self.ti_feed = params.feed['ti']
-        self.tv_feed = None
+    def calc_us(self, ac):
+        """
+        Parameters
+        ----------
+        ac : float
+            Inner cross section area of the reactor [m²]
 
-        self.b_hc = params.sim['b']
-        self.m_hc = params.sim['m']
-        self.nt_hc = params.sim['nt']
-        self.tmax_hc = params.sim['tmax']
-        self.t_hc = None
-        self.t_tinf = None
-        self.tk_hc = None
-
-        self._build_t_hc()
-        self._calc_us()
-        self._calc_devol_time()
-        self._calc_trans_hc()
-        self._calc_time_to_tinf()
-
-    def _build_t_hc(self):
-        # nt is number of time steps
-        dt = self.tmax_hc / self.nt_hc                # time step [s]
-        t = np.arange(0, self.tmax_hc + dt, dt)    # time vector [s]
-        self.t_hc = t
-
-    def _calc_us(self):
+        Returns
+        -------
+        us : float
+            Superficial gas velocity [m/s]
+        """
         p_kPa = self.gas.p / 1000
         q_lpm = cm.slm_to_lpm(self.gas.q, p_kPa, self.gas.tk)
         q_m3s = q_lpm / 60_000
-        us = q_m3s / self.ac_rct
-        self.us_bed = us
+        us = q_m3s / ac
+        return us
 
-    def _calc_devol_time(self):
-        dp = self.dp_feed * 1000
-        tv = cm.devol_time(dp, self.gas.tk)
-        self.tv_feed = tv
+    def calc_umf_ergun(self, mug):
+        """
+        Parameters
+        ----------
+        mug : float
+            Gas viscosity [µP]
 
-    def _calc_trans_hc(self):
+        Returns
+        -------
+        umf : float
+            Minimum fluidization velocity based on Ergun equation [m/s]
+        """
+        # Conversion for kg/ms = µP * 1e-7
+        dp = self.params.bed['dps'][0]
+        ep = self.params.bed['ep']
+        mug = mug * 1e-7
+        phi = self.params.bed['phi']
+        rhog = self.gas.rho
+        rhos = self.params.bed['rhos']
+        umf = cm.umf_ergun(dp, ep, mug, phi, rhog, rhos)
+        return umf
+
+    @staticmethod
+    def calc_us_umf(us, umf):
+        """
+        Returns ratio of us to umf.
+        """
+        return us / umf
+
+    def calc_zexp(self, umf, us):
+        """
+        Parameters
+        ----------
+        umf : float
+            Minimum fluidization velocity [m/s]
+        us : float
+            Superficial gas velocity [m/s]
+
+        Returns
+        -------
+        zexp : float
+            Bed expansion height [m]
+        """
+        di = self.params.reactor['di']
+        dp = self.params.bed['dps'][0]
+        rhog = self.gas.rho
+        rhos = self.params.bed['rhos']
+        zmf = self.params.bed['zmf']
+        fbexp = cm.fbexp(di, dp, rhog, rhos, umf, us)
+        zexp = zmf * fbexp
+        return zexp
+
+    """
+    Transient heat conduction methods.
+    """
+
+    def build_time_vector(self):
+        """
+        Returns
+        -------
+        t : vector
+            Times for calculating transient heat conduction in biomass particle [s]
+        """
+        # nt is number of time steps
+        nt = self.params.sim['nt']
+        tmax = self.params.sim['tmax']
+        dt = tmax / nt                      # time step [s]
+        t = np.arange(0, tmax + dt, dt)     # time vector [s]
+        return t
+
+    def calc_trans_hc(self, t, tk_inf):
+        """
+        Returns
+        -------
+        tk : array
+            Temperature profile inside the biomass particle.
+        """
         # Calculate temperature profiles within particle.
         # rows = time step, columns = center to surface temperature
-        tinf = self.gas.tk
-        tk = hc2(self.dp_feed, self.mc_feed, self.k_feed, self.sg_feed, self.h_feed, self.ti_feed, tinf, self.b_hc, self.m_hc, self.t_hc)    # temperature array [K]
-        self.tk_hc = tk
+        dp = self.params.feed['dp_mean']
+        mc = self.params.feed['mc']
+        k = self.params.feed['k']
+        sg = self.params.feed['sg']
+        h = self.params.feed['h']
+        ti = self.params.feed['ti']
+        b = self.params.sim['b']
+        m = self.params.sim['m']
+        tk = hc2(dp, mc, k, sg, h, ti, tk_inf, b, m, t)     # temperature array [K]
+        return tk
 
-    def _calc_time_to_tinf(self):
-        # Determine time when particle has reached near reactor temperature.
-        tk_ref = self.gas.tk - 1                            # value near reactor temperature [K]
-        idx = np.where(self.tk_hc[:, 0] > tk_ref)[0][0]     # index where T > Tinf
-        t_ref = self.t_hc[idx]                              # time where T > Tinf
-        self.t_tinf = t_ref
+    def calc_time_to_tinf(self, t_hc, tk_hc):
+        """
+        Returns
+        -------
+        t : float
+            Time when biomass particle is near reactor temperature [s]
+        """
+        tk_ref = self.gas.tk - 1                        # value near reactor temperature [K]
+        idx = np.where(tk_hc[:, 0] > tk_ref)[0][0]      # index where T > Tinf
+        t_ref = t_hc[idx]                               # time where T > Tinf
+        return t_ref
 
-    def calc_umf_ergun(self, mu_option):
-        # Conversion for kg/ms = µP * 1e-7
-        if mu_option == 'graham':
-            mug = self.gas.mu_graham * 1e-7
-        elif mu_option == 'herning':
-            mug = self.gas.mu_herning * 1e-7
-        else:
-            mug = self.gas.mu * 1e-7
-        rhog = self.gas.rho
-        umf = cm.umf_ergun(self.dp_bed, self.ep_bed, mug, self.phi_bed, rhog, self.rhos_bed)
-        self.umf_ergun_bed = umf
+    """
+    Pyrolysis methods.
+    """
 
-    def calc_zexp(self, umf_option):
-        if umf_option == 'ergun':
-            umf = self.umf_ergun_bed
-        elif umf_option == 'wenyu':
-            umf = self.umf_wenyu_bed
-        rhog = self.gas.rho
-        fbexp = cm.fbexp(self.di_rct, self.dp_bed, rhog, self.rhos_bed, umf, self.us_bed)
-        zexp = self.zmf_bed * fbexp
-        self.zexp_bed = zexp
+    def calc_devol_time(self):
+        """
+        Returns
+        -------
+        tv : float
+            Devolatilization time of the biomass particle [s]
+        """
+        dp = self.params.feed['dp_mean'] * 1000
+        tv = cm.devol_time(dp, self.gas.tk)
+        return tv

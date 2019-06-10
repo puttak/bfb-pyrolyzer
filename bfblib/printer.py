@@ -3,7 +3,7 @@ import textwrap
 
 def print_parameters(pm):
     """
-    Print parameter names, values, and descriptions to console.
+    Print parameter names, values, and descriptions to terminal.
     """
     bed = pm.bed
     feed = pm.feed
@@ -36,64 +36,49 @@ def print_parameters(pm):
     print(textwrap.dedent(pm_string))
 
 
-def print_results(results):
+def print_gas_properties(gas):
     """
-    Printe results to console.
+    Print gas properties to terminal.
     """
-    ai = results['reactor'][0]
-
-    mw_h2 = results['gas_h2'][0]
-    mu_h2 = results['gas_h2'][1]
-    rho_h2 = results['gas_h2'][2]
-    us_h2 = results['gas_h2'][3]
-
-    mw_n2 = results['gas_n2'][0]
-    mu_n2 = results['gas_n2'][1]
-    rho_n2 = results['gas_n2'][2]
-    us_n2 = results['gas_n2'][3]
-
-    mu_graham = results['gas_mix'][0]
-    mu_herning = results['gas_mix'][1]
-    mw_mix = results['gas_mix'][2]
-    rho_mix = results['gas_mix'][3]
-
-    umf = results['bed'][0]
-    zexp = results['bed'][1]
-
-    t_devol = results['feedstock'][0]
-    t_tinf = results['feedstock'][3]
-
     res_string = f"""
     <<<<<<<<<<<< Results >>>>>>>>>>>>
 
-    ------------ Reactor -----------\n
-    {'ai':12} {ai:.4f} \t Inner cross section area [m²]
+    -------------- Gas -------------\n
+    {'sp':12} {gas.sp} \t Gas species [-]
+    {'mw':12} {gas.mw:.4f} \t Molecular weight [g/mol]
+    {'mu':12} {gas.mu:.2f} \t Viscosity [µP]
+    {'rho':12} {gas.rho:.4f} \t Density [kg/m³]"""
+    print(textwrap.dedent(res_string))
 
-    ------------ Gas H₂ ------------\n
-    {'mw':12} {mw_h2} \t Molecular weight [g/mol]
-    {'mu':12} {mu_h2:.2f} \t Viscosity [µP]
-    {'rho':12} {rho_h2:.4f} \t Density [kg/m³]
-    {'us':12} {us_h2:.4f} \t Superficial gas velocity [m/s]
 
-    ------------ Gas N₂ ------------\n
-    {'mw':12} {mw_n2} \t Molecular weight [g/mol]
-    {'mu':12} {mu_n2:.2f} \t Viscosity [µP]
-    {'rho':12} {rho_n2:.4f} \t Density [kg/m³]
-    {'us':12} {us_n2:.4f} \t Superficial gas velocity [m/s]
+def print_gas_mix_properties(gasmix):
+    """
+    Print gas mixture properties to terminal.
+    """
+    res_string = f"""
+    <<<<<<<<<<<< Results >>>>>>>>>>>>
 
-    ------ Gas Mixture H₂, N₂ ------\n
-    {'mu_graham':12} {mu_graham:.2f} \t Viscosity [µP]
-    {'mu_herning':12} {mu_herning:.2f} \t Viscosity [µP]
-    {'mw':12} {mw_mix:.2f} \t Molecular weight of gas mixture [g/mol]
-    {'rho':12} {rho_mix:.4f} \t Density of gas mixture [kg/m³]
+    ---------- Gas Mixture ---------\n
+    {'sp':12} {gasmix.sp} \t Gas species [-]
+    {'mw':12} {gasmix.mw:.4f} \t Molecular weight [g/mol]
+    {'mu':12} {gasmix.mu_graham:.2f} \t Viscosity (Graham) [µP]
+    {'mu':12} {gasmix.mu_herning:.2f} \t Viscosity (Herning) [µP]
+    {'rho':12} {gasmix.rho:.4f} \t Density [kg/m³]"""
+    print(textwrap.dedent(res_string))
 
-    ------------- Bed --------------\n
-    {'umf':12} {umf:.4f} \t Minimum fluidization velocity [m/s]
-    {'us_umf':12} {us_h2 / umf:.2f} \t Us/Umf for gas and bed particles [-]
-    {'zexp':12} {zexp:.2f} \t Height of expanded bed [m]
 
-    ---------- Feedstock -----------\n
-    {'t_devol':12} {t_devol:.2f} \t Devolatilization time for 95% conversion [s]
-    {'t_tinf':12} {t_tinf:.2f} \t Time for particle center to reach T∞ [s]
+def print_bfb_results(results):
+    """
+    Print BFB model results to terminal.
+    """
+    res_string = f"""
+    ----------- BFB Model ----------\n
+    {'ac':12} {results['ac']:.4f} \t Inner cross section area [m²]
+    {'us':12} {results['us']:.4f} \t Superficial gas velocity [m/s]
+    {'umf_ergun':12} {results['umf_ergun']:.4f} \t Minimum fluidization velocity [m/s]
+    {'us_umf':12} {results['us_umf']:.2f} \t Us/Umf for gas and bed particles [-]
+    {'zexp':12} {results['zexp']:.2f} \t Height of expanded bed [m]
+    {'t_devol':12} {results['t_devol']:.2f} \t Devolatilization time for 95% conversion [s]
+    {'t_tkinf':12} {results['t_tkinf']:.2f} \t Time for particle center to reach T∞ [s]
     """
     print(textwrap.dedent(res_string))
