@@ -64,12 +64,41 @@ class BfbModel:
         umf = cm.umf_ergun(dp, ep, mug, phi, rhog, rhos)
         return umf
 
-    @staticmethod
-    def calc_us_umf(us, umf):
+    def calc_umf_wenyu(self, mug):
         """
-        Returns ratio of us to umf.
+        Parameters
+        ----------
+        mug : float
+            Gas viscosity [µP]
+
+        Returns
+        -------
+        umf : float
+            Minimum fluidization velocity based on Wen and Yu equation [m/s]
         """
-        return us / umf
+        dp = self.params.bed['dps'][0]
+        mug = mug * 1e-7
+        rhog = self.gas.rho
+        rhos = self.params.bed['rhos']
+        umf = cm.umf_coeff(dp, mug, rhog, rhos, coeff='wenyu')
+        return umf
+
+    def calc_us_umf(self, us, umf):
+        """
+        Parameters
+        ----------
+        us : float
+            Superficial gas velocity [m/s]
+        umf : float
+            Minimum fluidization velocity [m/s]
+
+        Returns
+        -------
+        us_umf : float
+            Ratio of Us to Umf [-]
+        """
+        us_umf = us / umf
+        return us_umf
 
     def calc_zexp(self, umf, us):
         """
@@ -121,12 +150,12 @@ class BfbModel:
         """
         # Calculate temperature profiles within particle.
         # rows = time step, columns = center to surface temperature
-        dp = self.params.feed['dp_mean']
-        mc = self.params.feed['mc']
-        k = self.params.feed['k']
-        sg = self.params.feed['sg']
-        h = self.params.feed['h']
-        ti = self.params.feed['ti']
+        dp = self.params.biomass['dp_mean']
+        mc = self.params.biomass['mc']
+        k = self.params.biomass['k']
+        sg = self.params.biomass['sg']
+        h = self.params.biomass['h']
+        ti = self.params.biomass['ti']
         b = self.params.sim['b']
         m = self.params.sim['m']
         tk = hc2(dp, mc, k, sg, h, ti, tk_inf, b, m, t)     # temperature array [K]
@@ -155,6 +184,6 @@ class BfbModel:
         tv : float
             Devolatilization time of the biomass particle [s]
         """
-        dp = self.params.feed['dp_mean'] * 1000
+        dp = self.params.biomass['dp_mean'] * 1000
         tv = cm.devol_time(dp, self.gas.tk)
         return tv

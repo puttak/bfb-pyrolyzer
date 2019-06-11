@@ -1,5 +1,6 @@
 """
-Parameters for modeling the BFB pyrolysis reactor in the NREL 2FBR system.
+Parameters for modeling the BFB biomass pyrolysis reactor in the NREL 2FBR
+system.
 """
 
 # Simulation
@@ -12,7 +13,7 @@ sim = {
     'tmax': 6.0,    # Time duration to calculate particle temperature profile [s]
 }
 
-# Bed Conditions
+# Bed Conditions and Properties
 # ----------------------------------------------------------------------------
 
 bed = {
@@ -23,16 +24,16 @@ bed = {
     'zmf': 0.1016                       # Bed height at minimum fluidization [m]
 }
 
-# Feedstock Conditions
+# Biomass Conditions and Properties
 # ----------------------------------------------------------------------------
 
-# sg from Wood Handbook Table 4-7
+# Specific gravity and thermal conductivity from Wood Handbook Table 4-7
 
-feed = {
+biomass = {
     'dp_mean': 0.0005,  # Mean particle diameter [m]
-    'h': 350,           # Heat transfer coefficient to feedstock in bed [W/m²K]
-    'k': 0.11,          # Thermal conductivity [W/mK]
-    'mc': 0,            # Moisture content [%]
+    'h': 350,           # Heat transfer coefficient for convection [W/m²K]
+    'k': 0.12,          # Thermal conductivity of loblolly pine [W/mK]
+    'mc': 0.0,          # Moisture content [%]
     'sg': 0.54,         # Specific gravity of loblolly pine [-]
     'ti': 293.15        # Initial particle temperature [K]
 }
@@ -42,12 +43,13 @@ feed = {
 
 gas = {
     'p': 101_325,           # Gas pressure in reactor [Pa]
-    'q': 14,                # Volumetric flowrate of gas into reactor [SLM]
+    # 'q': 14,                # Volumetric flowrate of gas into reactor [SLM]
+    'q': 20,                # Volumetric flowrate of gas into reactor [SLM]
     'tk': 773.15,           # Gas temperature in reactor [K]
     'sp': ['H2', 'N2'],     # Gas species of each component in gas mixture [-]
     'x': [0.85, 0.15],      # Mole fraction of each component in gas mixture [-]
-    # 'sp': ['N2'],     # Gas species of each component in gas mixture [-]
-    # 'x': [1.0],      # Mole fraction of each component in gas mixture [-]
+    # 'sp': 'N2',             # Gas species of each component in gas mixture [-]
+    # 'x': 1.0,               # Mole fraction of each component in gas mixture [-]
 }
 
 # Reactor Geometry

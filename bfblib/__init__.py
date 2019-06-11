@@ -5,8 +5,6 @@ from .gas import GasMix
 from .bfb_model import BfbModel
 
 from .printer import print_parameters
-from .printer import print_gas_properties
-from .printer import print_gas_mix_properties
 from .printer import print_bfb_results
 
 from .plotter import plot_geldart

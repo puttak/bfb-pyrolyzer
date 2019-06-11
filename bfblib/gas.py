@@ -22,8 +22,7 @@ class Gas:
 
 class GasMix:
 
-    def __init__(self, sp, mus, mws, xs, params):
-        self.sp = sp
+    def __init__(self, mus, mws, xs, params):
         self.mus = mus
         self.mws = mws
         self.xs = xs
