@@ -1,6 +1,6 @@
-# BFB pyrolyzer
+# BFB pyrolyzer model
 
-This repository contains Python code for modeling a bubbling fluidized bed (BFB) biomass reactor operating at fast pyrolysis conditions. The model can be applied to other BFB reactors given the appropriate parameters and reaction mechanisms. See the [mfix-bfb-pyrolyzer](https://github.com/ccpcode/mfix-bfb-pyrolyzer) repository for a CFD example.
+This repository contains Python code for modeling a bubbling fluidized bed (BFB) biomass reactor operating at fast pyrolysis conditions. The model can be applied to other BFB pyrolyzer reactors given the appropriate parameters and reaction mechanisms. See the [mfix-bfb-pyrolyzer](https://github.com/ccpcode/mfix-bfb-pyrolyzer) repository for a CFD example.
 
 #### Contents
 

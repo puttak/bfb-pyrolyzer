@@ -1,4 +1,5 @@
 import chemics as cm
+import matplotlib.pyplot as plt
 import numpy as np
 from .trans_heat_cond import hc2
 
@@ -123,6 +124,17 @@ class BfbModel:
         zexp = zmf * fbexp
         return zexp
 
+    def build_geldart_figure(self):
+        # Conversion for m = µm * 1e6
+        # Conversion for g/cm³ = kg/m³ * 0.001
+        dp = self.params.bed['dps'][0] * 1e6
+        dpmin = self.params.bed['dps'][1] * 1e6
+        dpmax = self.params.bed['dps'][2] * 1e6
+        rhog = self.gas.rho * 0.001
+        rhos = self.params.bed['rhos'] * 0.001
+        fig = cm.geldart_chart(dp, rhog, rhos, dpmin, dpmax)
+        return fig
+
     """
     Transient heat conduction methods.
     """
@@ -161,7 +173,7 @@ class BfbModel:
         tk = hc2(dp, mc, k, sg, h, ti, tk_inf, b, m, t)     # temperature array [K]
         return tk
 
-    def calc_time_to_tinf(self, t_hc, tk_hc):
+    def calc_time_tkinf(self, t_hc, tk_hc):
         """
         Returns
         -------
@@ -172,6 +184,22 @@ class BfbModel:
         idx = np.where(tk_hc[:, 0] > tk_ref)[0][0]      # index where T > Tinf
         t_ref = t_hc[idx]                               # time where T > Tinf
         return t_ref
+
+    def build_heat_cond_figure(self, t, tk, t_tkinf):
+        """
+        here
+        """
+        fig, ax = plt.subplots(tight_layout=True)
+        ax.plot(t, tk[:, 0], lw=2, label='center')
+        ax.plot(t, tk[:, -1], lw=2, label='surface')
+        ax.axvline(t_tkinf, alpha=0.5, c='k', ls='--', label='Tinf')
+        ax.set_xlabel('Time [s]')
+        ax.set_ylabel('Temperature [K]')
+        ax.grid(color='0.9')
+        ax.legend(loc='best')
+        ax.set_frame_on(False)
+        ax.tick_params(color='0.9')
+        return fig
 
     """
     Pyrolysis methods.

@@ -7,10 +7,13 @@ system.
 # ----------------------------------------------------------------------------
 
 sim = {
-    'b': 2,         # Shape factor for particle transient heat conduction [-]
-    'm': 1000,      # Number of nodes from particle center (m=0) to surface (m)
-    'nt': 1000,     # Number of time steps for particle temperature profile
-    'tmax': 6.0,    # Time duration to calculate particle temperature profile [s]
+    'b': 2,                     # Shape factor for particle transient heat conduction [-]
+    'm': 1000,                  # Number of nodes from particle center (m=0) to surface (m)
+    'nt': 1000,                 # Number of time steps for particle temperature profile
+    'tmax': 6.0,                # Time duration to calculate particle temperature profile [s]
+    'tks': (723.15, 823.15),    # Temperature range [K]
+    'ps': (101_325, 150_000),   # Pressure range [Pa]
+    'qs': (14, 24),             # Volumetric flow range [SLM]
 }
 
 # Bed Conditions and Properties
