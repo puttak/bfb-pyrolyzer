@@ -6,6 +6,8 @@ system.
 # Simulation
 # ----------------------------------------------------------------------------
 
+# TODO run simulation cases for tks, ps, qs
+
 sim = {
     'b': 2,                     # Shape factor for particle transient heat conduction [-]
     'm': 1000,                  # Number of nodes from particle center (m=0) to surface (m)
@@ -46,8 +48,8 @@ biomass = {
 
 gas = {
     'p': 101_325,           # Gas pressure in reactor [Pa]
-    # 'q': 14,                # Volumetric flowrate of gas into reactor [SLM]
-    'q': 20,                # Volumetric flowrate of gas into reactor [SLM]
+    'q': 14,                # Volumetric flowrate of gas into reactor [SLM]
+    # 'q': 20,                # Volumetric flowrate of gas into reactor [SLM]
     'tk': 773.15,           # Gas temperature in reactor [K]
     'sp': ['H2', 'N2'],     # Gas species of each component in gas mixture [-]
     'x': [0.85, 0.15],      # Mole fraction of each component in gas mixture [-]

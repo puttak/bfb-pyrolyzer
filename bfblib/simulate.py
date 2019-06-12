@@ -1,7 +1,9 @@
+import json
 import textwrap
 from .gas import Gas
-from .gas import GasMix
+from .gas_mix import GasMix
 from .bfb_model import BfbModel
+import matplotlib.pyplot as plt
 
 
 class Simulate:
@@ -61,19 +63,21 @@ class Simulate:
 
         # Store results from calculations
         self.results = {
-            'gas_mw': gas.mw,
-            'gas_mu': mug,
-            'gas_rho': gas.rho,
-            'ac': ac,
-            'us': us,
-            'umf_ergun': umf_ergun,
-            'us_umf_ergun': us_umf_ergun,
-            'zexp_ergun': zexp_ergun,
-            'umf_wenyu': umf_wenyu,
-            'us_umf_wenyu': us_umf_wenyu,
-            'zexp_wenyu': zexp_wenyu,
-            't_tkinf': t_tkinf,
-            't_devol': t_devol
+            'gas_p': gas.p,
+            'gas_tk': gas.tk,
+            'gas_mw': round(gas.mw, 4),
+            'gas_mu': round(mug, 4),
+            'gas_rho': round(gas.rho, 4),
+            'ac': round(ac, 4),
+            'us': round(us, 4),
+            'umf_ergun': round(umf_ergun, 4),
+            'us_umf_ergun': round(us_umf_ergun, 4),
+            'zexp_ergun': round(zexp_ergun, 4),
+            'umf_wenyu': round(umf_wenyu, 4),
+            'us_umf_wenyu': round(us_umf_wenyu, 4),
+            'zexp_wenyu': round(zexp_wenyu, 4),
+            't_tkinf': round(t_tkinf, 4),
+            't_devol': round(t_devol, 4)
         }
 
         # Store plot figures
@@ -142,6 +146,8 @@ class Simulate:
         <<<<<<<<<<<< Results >>>>>>>>>>>>
 
         -------- Gas Properties --------\n
+        {'p':<{w}} {self.results['gas_p']:<{w},} Pressure [Pa]
+        {'tk':<{w}} {self.results['gas_tk']:<{w}} Temperature [K]
         {'mw':<{w}} {self.results['gas_mw']:<{w}.4f} Molecular weight [g/mol]
         {'mu':<{w}} {self.results['gas_mu']:<{w}.2f} Viscosity [µP]
         {'rho':<{w}} {self.results['gas_rho']:<{w}.4f} Density [kg/m³]
@@ -165,19 +171,31 @@ class Simulate:
         """
         print(textwrap.dedent(res_string))
 
-    def save_figures(self, path):
+    def save_results(self, path):
         """
-        Save figures as a PDF to the `results` directory.
+        Save results as a JSON file to the `results` directory.
 
         Parameters
         ----------
-        cwd : pathlib.PosixPath
-            Path to current working directory.
-        figs : dict
-            Each key is used to name file. Each value is a Matplotlib figure.
+        path : pathlib.PosixPath
+            Path to the `results` directory.
+        """
+        with open(f'{path}/results.json', 'w') as file:
+            file.write(json.dumps(self.results, indent=4))
+
+        print('Results saved to `results` folder.\n')
+
+    def save_figures(self, path):
+        """
+        Save figures as PDF files to the `results` directory.
+
+        Parameters
+        ----------
+        path : pathlib.PosixPath
+            Path to the `results` directory.
         """
         figs = self.figures
         for name, fig in figs.items():
             fig.savefig(f'{path}/{name}.pdf')
 
-        print('Plot figures saved to `results` folder.\n')
+        print('Figures saved to `results` folder.\n')

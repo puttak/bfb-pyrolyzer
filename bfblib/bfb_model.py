@@ -7,6 +7,16 @@ from .trans_heat_cond import hc2
 class BfbModel:
 
     def __init__(self, gas, params):
+        """
+        Model object representing a BFB biomass pyrolysis reactor.
+
+        Attributes
+        ----------
+        gas : Gas or GasMix object
+            Gas or gas mixture properties.
+        params : module
+            Parameters for model calculations.
+        """
         self.gas = gas
         self.params = params
 

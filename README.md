@@ -2,36 +2,25 @@
 
 This repository contains Python code for modeling a bubbling fluidized bed (BFB) biomass reactor operating at fast pyrolysis conditions. The model can be applied to other BFB pyrolyzer reactors given the appropriate parameters and reaction mechanisms. See the [mfix-bfb-pyrolyzer](https://github.com/ccpcode/mfix-bfb-pyrolyzer) repository for a CFD example.
 
-#### Contents
-
-- [Installation and usage](#installation-and-usage)
-- [NREL 2FBR pyrolyzer](#nrel-2fbr-pyrolyzer)
-- [NREL DCR pyrolyzer](#nrel-dcr-pyrolyzer)
-- [Contributing](#contributing)
-- [License](#license)
-
 ## Installation and usage
 
-The BFB model was developed with Python 3.7 and the Chemics Python package. To ensure proper execution, the Anaconda Python distribution is recommended for all platforms.
+The BFB pyrolysis model was developed with Python 3.7 and the Chemics Python package. To ensure proper execution, the Anaconda Python distribution is recommended for all platforms.
 
-- [Anaconda](https://www.anaconda.com)
+- [Anaconda](https://www.anaconda.com/distribution/)
 - [Chemics](https://chemics.github.io)
 
-Different aspects of the model can be run as follows:
+Command line options for running the model are shown below.
 
-```python
-# code examples coming soon...
+```bash
+# Run the model with a specified parameters file
+python main.py twofbr.params
+
+# Save results and figures to the `results` folder
+python main.py twofbr.params -s
+
+# Delete the `results` folder
+python main.py twofbr.params -c
 ```
-
-## NREL 2FBR pyrolyzer
-
-The NREL 2FBR system consists of a 2-inch diameter bubbling fluidized bed (BFB) reactor for biomass fast pyrolysis. Computational models for evaluating the operation of this BFB pyrolyzer are available in this repository.
-
-Visit the [CCPCode website](https://ccpcode.github.io) for an overview of computational models and CFD simulations available for the NREL 2FBR system.
-
-## NREL DCR pyrolyzer
-
-Coming soon...
 
 ## Contributing
 

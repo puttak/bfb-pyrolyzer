@@ -1,0 +1,17 @@
+{
+    "gas_p": 101325,
+    "gas_tk": 773.15,
+    "gas_mw": 5.9157,
+    "gas_mu": 252.8133,
+    "gas_rho": 0.0932,
+    "ac": 0.0021,
+    "us": 0.3072,
+    "umf_ergun": 0.0712,
+    "us_umf_ergun": 4.3134,
+    "zexp_ergun": 0.1469,
+    "umf_wenyu": 0.0528,
+    "us_umf_wenyu": 5.8178,
+    "zexp_wenyu": 0.1498,
+    "t_tkinf": 2.664,
+    "t_devol": 2.5031
+}
