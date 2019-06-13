@@ -3,45 +3,52 @@ import textwrap
 from .gas import Gas
 from .gas_mix import GasMix
 from .bfb_model import BfbModel
-import matplotlib.pyplot as plt
 
 
 class Simulate:
 
-    def __init__(self, params):
-        self.params = params
+    def __init__(self):
         self.results = {}
         self.figures = {}
-        self._run()
-        self._print_parameters()
-        self._print_results()
 
-    def _run(self):
+    def load_parameters(self, params):
+        """
+        Parameters
+        ----------
+        params : module
+            Parameters for model calculations.
+        """
+        self.bedpm = params.bedpm
+        self.biopm = params.biopm
+        self.gaspm = params.gaspm
+        self.rctpm = params.rctpm
+
+    def run(self):
 
         # Gas properties
         # Species `sp` in parameters file can be a string for a single gas
         # component or a list for a gas mixture.
         # Note that gas mixture uses the Herning calculation for viscosity.
-        sp = self.params.gas['sp']
+        sp = self.gaspm.sp
 
         if type(sp) is list:
             mus = []
             mws = []
             xs = []
             for i in range(len(sp)):
-                gas = Gas(sp[i], self.params.gas['x'][i], self.params)
+                gas = Gas(sp[i], self.gaspm.x[i], self.gaspm)
                 mus.append(gas.mu)
                 mws.append(gas.mw)
                 xs.append(gas.x)
-            gas = GasMix(mus, mws, xs, self.params)
+            gas = GasMix(mus, mws, xs, self.gaspm)
             mug = gas.mu_herning
         elif type(sp) is str:
-            gas = Gas(sp, self.params.gas['x'], self.params)
+            gas = Gas(sp, self.gaspm.x, self.gaspm)
             mug = gas.mu
 
         # BFB model for fluidization and biomass pyrolysis
         # Matplotlib figures are denoted by the `fig_` prefix
-        bfb = BfbModel(gas, self.params)
+        bfb = BfbModel(gas, self.bedpm, self.biopm, self.rctpm)
         ac = bfb.calc_inner_ac()
         us = bfb.calc_us(ac)
 
@@ -86,21 +93,16 @@ class Simulate:
             'heatcond': fig_heatcond
         }
 
-    def _print_parameters(self):
+    def print_parameters(self):
         """
         Print parameter names, values, and descriptions to terminal.
         """
-        bed = self.params.bed
-        biomass = self.params.biomass
-        gas = self.params.gas
-        reactor = self.params.reactor
-
-        if type(self.params.gas['sp']) is list:
-            sp = ', '.join(self.params.gas['sp'])
-            x = ', '.join([str(gx) for gx in self.params.gas['x']])
+        if type(self.gaspm.sp) is list:
+            sp = ', '.join(self.gaspm.sp)
+            x = ', '.join([str(gx) for gx in self.gaspm.x])
         else:
-            sp = self.params.gas['sp']
-            x = self.params.gas['x']
+            sp = self.gaspm.sp
+            x = self.gaspm.x
 
         w = 12  # width specifier
 
@@ -108,35 +110,35 @@ class Simulate:
         <<<<<<<<<< Parameters >>>>>>>>>>
 
         ------------- Bed --------------\n
-        {'dp_mean':<{w}} {bed['dps'][0]:<{w}} Mean particle diameter [m]
-        {'dp_min':<{w}} {bed['dps'][1]:<{w}} Minimum particle diameter [m]
-        {'dp_max':<{w}} {bed['dps'][2]:<{w}} Maximum particle diameter [m]
-        {'ep':<{w}} {bed['ep']:<{w}} Void fraction of bed [-]
-        {'phi':<{w}} {bed['phi']:<{w}} Particle sphericity [-]
-        {'rhos':<{w}} {bed['rhos']:<{w}} Density of a bed particle [kg/m³]
-        {'zmf':<{w}} {bed['zmf']:<{w}} Bed height at minimum fluidization [m]
+        {'dp_mean':<{w}} {self.bedpm.dps[0]:<{w}} Mean particle diameter [m]
+        {'dp_min':<{w}} {self.bedpm.dps[1]:<{w}} Minimum particle diameter [m]
+        {'dp_max':<{w}} {self.bedpm.dps[2]:<{w}} Maximum particle diameter [m]
+        {'ep':<{w}} {self.bedpm.ep:<{w}} Void fraction of bed [-]
+        {'phi':<{w}} {self.bedpm.phi:<{w}} Particle sphericity [-]
+        {'rhos':<{w}} {self.bedpm.rhos:<{w}} Density of a bed particle [kg/m³]
+        {'zmf':<{w}} {self.bedpm.zmf:<{w}} Bed height at minimum fluidization [m]
 
         ----------- Biomass ------------\n
-        {'dp_mean':<{w}} {biomass['dp_mean']:<{w}} Mean particle diameter [m]
-        {'h':<{w}} {biomass['h']:<{w}} Heat transfer coefficient for convection [W/m²K]
-        {'k':<{w}} {biomass['k']:<{w}} Thermal conductivity of loblolly pine [W/mK]
-        {'mc':<{w}} {biomass['mc']:<{w}} Moisture content [%]
-        {'sg':<{w}} {biomass['sg']:<{w}} Specific gravity of loblolly pine [-]
-        {'ti':<{w}} {biomass['ti']:<{w}} Initial particle temperature [K]
+        {'dp_mean':<{w}} {self.biopm.dp_mean:<{w}} Mean particle diameter [m]
+        {'h':<{w}} {self.biopm.h:<{w}} Heat transfer coefficient for convection [W/m²K]
+        {'k':<{w}} {self.biopm.k:<{w}} Thermal conductivity of loblolly pine [W/mK]
+        {'mc':<{w}} {self.biopm.mc:<{w}} Moisture content [%]
+        {'sg':<{w}} {self.biopm.sg:<{w}} Specific gravity of loblolly pine [-]
+        {'tk_i':<{w}} {self.biopm.tk_i:<{w}} Initial particle temperature [K]
 
         ------------- Gas --------------\n
         {'sp':<{w}} {sp:<{w}} Components of gas mixture [-]
-        {'p':<{w}} {gas['p']:<{w},} Gas pressure in reactor [Pa]
-        {'q':<{w}} {gas['q']:<{w}} Volumetric flowrate of gas into reactor [SLM]
-        {'tk':<{w}} {gas['tk']:<{w}} Gas temperature in reactor [K]
+        {'p':<{w}} {self.gaspm.p:<{w},} Gas pressure in reactor [Pa]
+        {'q':<{w}} {self.gaspm.q:<{w}} Volumetric flowrate of gas into reactor [SLM]
+        {'tk':<{w}} {self.gaspm.tk:<{w}} Gas temperature in reactor [K]
         {'x':<{w}} {x:<{w}} Mole fractions of components in gas mixture [-]
 
         ------------ Reactor -----------\n
-        {'di':<{w}} {reactor['di']:<{w}} Inner diameter of reactor [m]
+        {'di':<{w}} {self.rctpm.di:<{w}} Inner diameter of reactor [m]
         """
         print(textwrap.dedent(pm_string))
 
-    def _print_results(self):
+    def print_results(self):
         """
         Print BFB model results to terminal.
         """

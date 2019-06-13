@@ -15,7 +15,7 @@ class GasMix:
             Molecular weight of each gas component [g/mol]
         xs : list or tuple
             Mole fraction of each gas component.
-        params : module
+        params : dataclass
             Parameters for calculating gas mixture properties.
 
         Attributes
@@ -44,9 +44,9 @@ class GasMix:
         self.mus = mus
         self.mws = mws
         self.xs = xs
-        self.p = params.gas['p']
-        self.q = params.gas['q']
-        self.tk = params.gas['tk']
+        self.p = params.p
+        self.q = params.q
+        self.tk = params.tk
         self.mu_graham = None
         self.mu_herning = None
         self.mw = None

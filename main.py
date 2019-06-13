@@ -14,7 +14,11 @@ def main(args):
     params = importlib.import_module(args.infile)
 
     # Run simulation based on parameters
-    sim = Simulate(params)
+    sim = Simulate()
+    sim.load_parameters(params)
+    sim.run()
+    sim.print_parameters()
+    sim.print_results()
 
     # Save results and figures to `results` folder
     # Create `results` folder in current directory if it doesn't exist

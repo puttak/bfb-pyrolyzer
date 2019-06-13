@@ -13,7 +13,7 @@ class Gas:
             Species representing gas component.
         x : float
             Mole fraction of gas component.
-        params : module
+        params : dataclass
             Parameters for calculating gas properties.
 
         Attributes
@@ -37,9 +37,9 @@ class Gas:
         """
         self.sp = sp
         self.x = x
-        self.p = params.gas['p']
-        self.q = params.gas['q']
-        self.tk = params.gas['tk']
+        self.p = params.p
+        self.q = params.q
+        self.tk = params.tk
         self.mw = None
         self.mu = None
         self.rho = None
