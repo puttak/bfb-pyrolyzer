@@ -6,7 +6,7 @@ from .trans_heat_cond import hc2
 
 class BfbModel:
 
-    def __init__(self, gas, bedparams, bioparams, rctparams):
+    def __init__(self, gas, params_bed, params_biomass, params_reactor):
         """
         Model object representing a BFB biomass pyrolysis reactor.
 
@@ -18,9 +18,9 @@ class BfbModel:
             Parameters for model calculations.
         """
         self.gas = gas
-        self.bedpm = bedparams
-        self.biopm = bioparams
-        self.rctpm = rctparams
+        self.params_bed = params_bed
+        self.params_biomass = params_biomass
+        self.params_reactor = params_reactor
 
     """
     Fluidization methods.
@@ -33,7 +33,7 @@ class BfbModel:
         ac : float
             Inner cross section area of the rector [m²]
         """
-        di = self.rctpm.di
+        di = self.params_reactor['di']
         ac = (np.pi * di**2) / 4
         return ac
 
@@ -49,8 +49,8 @@ class BfbModel:
         us : float
             Superficial gas velocity [m/s]
         """
-        p_kPa = self.gas.p / 1000
-        q_lpm = cm.slm_to_lpm(self.gas.q, p_kPa, self.gas.tk)
+        p_kpa = self.gas.p / 1000
+        q_lpm = cm.slm_to_lpm(self.gas.q, p_kpa, self.gas.tk)
         q_m3s = q_lpm / 60_000
         us = q_m3s / ac
         return us
@@ -68,12 +68,12 @@ class BfbModel:
             Minimum fluidization velocity based on Ergun equation [m/s]
         """
         # Conversion for kg/ms = µP * 1e-7
-        dp = self.bedpm.dps[0]
-        ep = self.bedpm.ep
+        dp = self.params_bed['dp'][0]
+        ep = self.params_bed['ep']
         mug = mug * 1e-7
-        phi = self.bedpm.phi
+        phi = self.params_bed['phi']
         rhog = self.gas.rho
-        rhos = self.bedpm.rhos
+        rhos = self.params_bed['rhos']
         umf = cm.umf_ergun(dp, ep, mug, phi, rhog, rhos)
         return umf
 
@@ -89,10 +89,10 @@ class BfbModel:
         umf : float
             Minimum fluidization velocity based on Wen and Yu equation [m/s]
         """
-        dp = self.bedpm.dps[0]
+        dp = self.params_bed['dp'][0]
         mug = mug * 1e-7
         rhog = self.gas.rho
-        rhos = self.bedpm.rhos
+        rhos = self.params_bed['rhos']
         umf = cm.umf_coeff(dp, mug, rhog, rhos, coeff='wenyu')
         return umf
 
@@ -127,11 +127,11 @@ class BfbModel:
         zexp : float
             Bed expansion height [m]
         """
-        di = self.rctpm.di
-        dp = self.bedpm.dps[0]
+        di = self.params_reactor['di']
+        dp = self.params_bed['dp'][0]
         rhog = self.gas.rho
-        rhos = self.bedpm.rhos
-        zmf = self.bedpm.zmf
+        rhos = self.params_bed['rhos']
+        zmf = self.params_bed['zmf']
         fbexp = cm.fbexp(di, dp, rhog, rhos, umf, us)
         zexp = zmf * fbexp
         return zexp
@@ -139,11 +139,11 @@ class BfbModel:
     def build_geldart_figure(self):
         # Conversion for m = µm * 1e6
         # Conversion for g/cm³ = kg/m³ * 0.001
-        dp = self.bedpm.dps[0] * 1e6
-        dpmin = self.bedpm.dps[1] * 1e6
-        dpmax = self.bedpm.dps[2] * 1e6
+        dp = self.params_bed['dp'][0] * 1e6
+        dpmin = self.params_bed['dp'][1] * 1e6
+        dpmax = self.params_bed['dp'][2] * 1e6
         rhog = self.gas.rho * 0.001
-        rhos = self.bedpm.rhos * 0.001
+        rhos = self.params_bed['rhos'] * 0.001
         fig = cm.geldart_chart(dp, rhog, rhos, dpmin, dpmax)
         return fig
 
@@ -159,8 +159,8 @@ class BfbModel:
             Times for calculating transient heat conduction in biomass particle [s]
         """
         # nt is number of time steps
-        nt = self.biopm.nt
-        tmax = self.biopm.t_max
+        nt = self.params_biomass['nt']
+        tmax = self.params_biomass['t_max']
         dt = tmax / nt                      # time step [s]
         t = np.arange(0, tmax + dt, dt)     # time vector [s]
         return t
@@ -174,14 +174,14 @@ class BfbModel:
         """
         # Calculate temperature profiles within particle.
         # rows = time step, columns = center to surface temperature
-        dp = self.biopm.dp_mean
-        mc = self.biopm.mc
-        k = self.biopm.k
-        sg = self.biopm.sg
-        h = self.biopm.h
-        ti = self.biopm.tk_i
-        b = self.biopm.b
-        m = self.biopm.m
+        dp = self.params_biomass['dp_mean']
+        mc = self.params_biomass['mc']
+        k = self.params_biomass['k']
+        sg = self.params_biomass['sg']
+        h = self.params_biomass['h']
+        ti = self.params_biomass['tk_i']
+        b = self.params_biomass['b']
+        m = self.params_biomass['m']
         tk = hc2(dp, mc, k, sg, h, ti, tk_inf, b, m, t)     # temperature array [K]
         return tk
 
@@ -224,6 +224,6 @@ class BfbModel:
         tv : float
             Devolatilization time of the biomass particle [s]
         """
-        dp = self.biopm.dp_mean * 1000
+        dp = self.params_biomass['dp_mean'] * 1000
         tv = cm.devol_time(dp, self.gas.tk)
         return tv
