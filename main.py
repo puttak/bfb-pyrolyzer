@@ -5,36 +5,34 @@ Main driver for BFB model of a biomass pyrolysis reactor.
 import argparse
 import importlib
 import pathlib
+
 from bfblib import Simulation
-from bfblib import print_parameters
-from bfblib import print_results
 
 
 def main(args):
 
-    # Get parameters as a Python module
+    # Get parameters from a Python module
     infile = args.infile.replace('/', '.')[:-3]
     params = importlib.import_module(infile)
 
+    # Initialize simulation with parameters
+    sim = Simulation(params)
+
+    # Run simulation or a simulation case based on command line option
     if args.temps:
-        # Run simulation case for temperatures
-        sim = Simulation(params)
         sim.run_temps()
-        path = pathlib.Path(pathlib.Path.cwd(), 'results')
+        path = pathlib.Path.cwd() / 'results'
         if not path.exists():
             path.mkdir()
         sim.save_results(path, case=True)
     else:
-        # Run simulation based on BFB model parameters
-        sim = Simulation(params)
         sim.run_params()
-        print_parameters(params)
-        print_results(sim.results)
+        sim.print_parameters()
+        sim.print_results()
 
-        # Save results and figures to `results` folder
-        # Create `results` folder in current directory if it doesn't exist
+        # Save results and figures to `results` folder.
         if args.save:
-            path = pathlib.Path(pathlib.Path.cwd(), 'results')
+            path = pathlib.Path.cwd() / 'results'
             if not path.exists():
                 path.mkdir()
             sim.save_results(path)
@@ -51,11 +49,10 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     if args.clean:
-        cwd = pathlib.Path.cwd()
-        resdir = pathlib.Path(cwd, 'results')
-        for file in resdir.iterdir():
+        path = pathlib.Path.cwd() / 'results'
+        for file in path.iterdir():
             file.unlink()
-        resdir.rmdir()
+        path.rmdir()
         print('\nDeleted `results` folder.\n')
     else:
         main(args)
