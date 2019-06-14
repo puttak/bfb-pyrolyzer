@@ -13,13 +13,17 @@ Command line options for running the model are shown below.
 
 ```bash
 # Run the model with a specified parameters file
-python main.py twofbr.params
+python main.py twofbr/params.py
+
+# Run the model for a range of temperatures
+# Temperature range is specified in `case` within parameters file
+python main.py twofbr/params.py -t
 
 # Save results and figures to the `results` folder
-python main.py twofbr.params -s
+python main.py twofbr/params.py -s
 
 # Delete the `results` folder
-python main.py twofbr.params -c
+python main.py twofbr/params.p -c
 ```
 
 ## Contributing
