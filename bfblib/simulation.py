@@ -8,8 +8,9 @@ from .bfb_model import BfbModel
 
 class Simulation:
 
-    def __init__(self, params):
+    def __init__(self, params, path=None):
         self.params = params
+        self.path = path
         self.results = {}
         self.figures = {}
         self.results_case = []
@@ -22,59 +23,23 @@ class Simulation:
         gas.calc_properties()
 
         # BFB model for fluidization and biomass pyrolysis
-        # Matplotlib figures are denoted by the `fig_` prefix
-        bfb = BfbModel(gas, self.params.bed, self.params.biomass, self.params.reactor)
-        ac = bfb.calc_inner_ac()
-        us = bfb.calc_us(ac)
+        bfb = BfbModel(gas, self.params)
 
-        umf_ergun = bfb.calc_umf_ergun(gas.mu)
-        us_umf_ergun = bfb.calc_us_umf(us, umf_ergun)
-        zexp_ergun = bfb.calc_zexp(umf_ergun, us)
-
-        umf_wenyu = bfb.calc_umf_wenyu(gas.mu)
-        us_umf_wenyu = bfb.calc_us_umf(us, umf_wenyu)
-        zexp_wenyu = bfb.calc_zexp(umf_wenyu, us)
-
-        t_hc = bfb.build_time_vector()
-        tk_hc = bfb.calc_trans_hc(t_hc, gas.tk)
-        t_tkinf = bfb.calc_time_tkinf(t_hc, tk_hc)
-        t_devol = bfb.calc_devol_time()
-
-        fig_geldart = bfb.build_geldart_figure()
-        fig_heatcond = bfb.build_heat_cond_figure(t_hc, tk_hc, t_tkinf)
-
-        # Store results from calculations
-        self.results = {
-            'gas_p': gas.p,
-            'gas_tk': gas.tk,
-            'gas_mw': round(gas.mw, 4),
-            'gas_mu': round(gas.mu, 4),
-            'gas_rho': round(gas.rho, 4),
-            'ac': round(ac, 4),
-            'us': round(us, 4),
-            'umf_ergun': round(umf_ergun, 4),
-            'us_umf_ergun': round(us_umf_ergun, 4),
-            'zexp_ergun': round(zexp_ergun, 4),
-            'umf_wenyu': round(umf_wenyu, 4),
-            'us_umf_wenyu': round(us_umf_wenyu, 4),
-            'zexp_wenyu': round(zexp_wenyu, 4),
-            't_tkinf': round(t_tkinf, 4),
-            't_devol': round(t_devol, 4)
-        }
-
-        # Store plot figures
-        self.figures = {
-            'geldart': fig_geldart,
-            'heatcond': fig_heatcond
-        }
+        if self.path is not None:
+            bfb.solve(build_figures=True)
+            self.results = bfb.results
+            self.figures = bfb.figures
+            self.save_results()
+            self.save_figures()
+        else:
+            bfb.solve()
+            self.results = bfb.results
+            self.print_parameters()
+            self.print_results()
 
     def run_temps(self):
 
-        print(textwrap.dedent(f"""
-        >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-              Simulate Temperatures
-        <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<"""))
-
+        print('>>>>>>>> Simulate Temperatures <<<<<<<<')
         tk_min = self.params.case['tk'][0]
         tk_max = self.params.case['tk'][1]
         tks = np.arange(tk_min, tk_max + 10, 10)
@@ -89,42 +54,12 @@ class Simulation:
             gas.calc_properties()
 
             # BFB model for fluidization and biomass pyrolysis
-            # Matplotlib figures are denoted by the `fig_` prefix
-            bfb = BfbModel(gas, self.params.bed, self.params.biomass, self.params.reactor)
-            ac = bfb.calc_inner_ac()
-            us = bfb.calc_us(ac)
+            bfb = BfbModel(gas, self.params)
+            bfb.solve()
+            self.results_case.append(bfb.results)
 
-            umf_ergun = bfb.calc_umf_ergun(gas.mu)
-            us_umf_ergun = bfb.calc_us_umf(us, umf_ergun)
-            zexp_ergun = bfb.calc_zexp(umf_ergun, us)
-
-            umf_wenyu = bfb.calc_umf_wenyu(gas.mu)
-            us_umf_wenyu = bfb.calc_us_umf(us, umf_wenyu)
-            zexp_wenyu = bfb.calc_zexp(umf_wenyu, us)
-
-            t_hc = bfb.build_time_vector()
-            tk_hc = bfb.calc_trans_hc(t_hc, gas.tk)
-            t_tkinf = bfb.calc_time_tkinf(t_hc, tk_hc)
-            t_devol = bfb.calc_devol_time()
-
-            # Store results from calculations
-            self.results_case.append({
-                'gas_p': gas.p,
-                'gas_tk': gas.tk,
-                'gas_mw': round(gas.mw, 4),
-                'gas_mu': round(gas.mu, 4),
-                'gas_rho': round(gas.rho, 4),
-                'ac': round(ac, 4),
-                'us': round(us, 4),
-                'umf_ergun': round(umf_ergun, 4),
-                'us_umf_ergun': round(us_umf_ergun, 4),
-                'zexp_ergun': round(zexp_ergun, 4),
-                'umf_wenyu': round(umf_wenyu, 4),
-                'us_umf_wenyu': round(us_umf_wenyu, 4),
-                'zexp_wenyu': round(zexp_wenyu, 4),
-                't_tkinf': round(t_tkinf, 4),
-                't_devol': round(t_devol, 4)
-            })
+        print('Done.')
+        self.save_results()
 
     def print_parameters(self):
         """
@@ -140,9 +75,7 @@ class Simulation:
         w = 12  # width specifier
 
         pm_string = f"""
-        >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                   Parameters
-        <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        >>>>>>>>>> Parameters <<<<<<<<<<
 
         ------------- Bed --------------\n
         {'dp_mean':<{w}} {params_bed['dp'][0]:<{w}} Mean particle diameter [m]
@@ -177,67 +110,52 @@ class Simulation:
         """
         Print BFB model results to terminal.
         """
-        results = self.results
         w = 12  # width specifier
 
         res_string = f"""
-        >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-                    Results
-        <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        >>>>>>>>>>> Results <<<<<<<<<<<<
 
         -------- Gas Properties --------\n
-        {'p':<{w}} {results['gas_p']:<{w},} Pressure [Pa]
-        {'tk':<{w}} {results['gas_tk']:<{w}} Temperature [K]
-        {'mw':<{w}} {results['gas_mw']:<{w}.4f} Molecular weight [g/mol]
-        {'mu':<{w}} {results['gas_mu']:<{w}.2f} Viscosity [µP]
-        {'rho':<{w}} {results['gas_rho']:<{w}.4f} Density [kg/m³]
+        {'mw':<{w}} {self.results['gas_mw']:<{w}.4f} Molecular weight [g/mol]
+        {'mu':<{w}} {self.results['gas_mu']:<{w}.2f} Viscosity [µP]
+        {'rho':<{w}} {self.results['gas_rho']:<{w}.4f} Density [kg/m³]
 
         ----------- BFB Model ----------\n
-        {'ac':<{w}} {results['ac']:<{w}.4f} Inner cross section area [m²]
-        {'us':<{w}} {results['us']:<{w}.4f} Superficial gas velocity [m/s]
+        {'ac':<{w}} {self.results['ac']:<{w}.4f} Inner cross section area [m²]
+        {'us':<{w}} {self.results['us']:<{w}.4f} Superficial gas velocity [m/s]
 
         Ergun
-        {'umf':<{w}} {results['umf_ergun']:<{w}.4f} Minimum fluidization velocity [m/s]
-        {'us_umf':<{w}} {results['us_umf_ergun']:<{w}.2f} Us/Umf for gas and bed particles [-]
-        {'zexp':<{w}} {results['zexp_ergun']:<{w}.2f} Height of expanded bed [m]
+        {'umf':<{w}} {self.results['umf_ergun']:<{w}.4f} Minimum fluidization velocity [m/s]
+        {'us_umf':<{w}} {self.results['us_umf_ergun']:<{w}.2f} Us/Umf for gas and bed particles [-]
+        {'zexp':<{w}} {self.results['zexp_ergun']:<{w}.2f} Height of expanded bed [m]
 
         Wen and Yu
-        {'umf':<{w}} {results['umf_wenyu']:<{w}.4f} Minimum fluidization velocity [m/s]
-        {'us_umf':<{w}} {results['us_umf_wenyu']:<{w}.2f} Us/Umf for gas and bed particles [-]
-        {'zexp':<{w}} {results['zexp_wenyu']:<{w}.2f} Height of expanded bed [m]
+        {'umf':<{w}} {self.results['umf_wenyu']:<{w}.4f} Minimum fluidization velocity [m/s]
+        {'us_umf':<{w}} {self.results['us_umf_wenyu']:<{w}.2f} Us/Umf for gas and bed particles [-]
+        {'zexp':<{w}} {self.results['zexp_wenyu']:<{w}.2f} Height of expanded bed [m]
 
-        {'t_devol':<{w}} {results['t_devol']:<{w}.2f} Devolatilization time for 95% conversion [s]
-        {'t_tkinf':<{w}} {results['t_tkinf']:<{w}.2f} Time for particle center to reach T∞ [s]
+        {'t_devol':<{w}} {self.results['t_devol']:<{w}.2f} Devolatilization time for 95% conversion [s]
+        {'t_tkinf':<{w}} {self.results['t_tkinf']:<{w}.2f} Time for particle center to reach T∞ [s]
         """
         print(textwrap.dedent(res_string))
 
-    def save_results(self, path, case=False):
+    def save_results(self):
         """
-        Save results as a JSON file to the `results` directory.
-
-        Parameters
-        ----------
-        path : pathlib.PosixPath
-            Path to the `results` directory.
+        Save BFB model results as a JSON file to the `results` folder.
         """
-        with open(f'{path}/results.json', 'w') as file:
-            if case:
+        with open(f'{self.path}/results.json', 'w') as file:
+            if bool(self.results) is False:
                 file.write(json.dumps(self.results_case, indent=4))
             else:
                 file.write(json.dumps(self.results, indent=4))
 
-        print('Results saved to `results` folder.\n')
+        print('Results saved to `results` folder.')
 
-    def save_figures(self, path):
+    def save_figures(self):
         """
-        Save figures as PDF files to the `results` directory.
-
-        Parameters
-        ----------
-        path : pathlib.PosixPath
-            Path to the `results` directory.
+        Save BFB model figures as PDF files to the `results` folder.
         """
         for name, fig in self.figures.items():
-            fig.savefig(f'{path}/{name}.pdf')
+            fig.savefig(f'{self.path}/{name}.pdf')
 
-        print('Figures saved to `results` folder.\n')
+        print('Matplotlib figures saved to `results` folder.')
