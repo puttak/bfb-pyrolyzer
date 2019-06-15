@@ -141,7 +141,7 @@ class Simulation:
 
     def save_results(self):
         """
-        Save BFB model results as a JSON file to the `results` folder.
+        Save BFB model results as a JSON file.
         """
         with open(f'{self.path}/results.json', 'w') as file:
             if bool(self.results) is False:
@@ -149,7 +149,7 @@ class Simulation:
             else:
                 file.write(json.dumps(self.results, indent=4))
 
-        print('Results saved to `results` folder.')
+        print(f'Results saved to `{self.path.name}` folder.')
 
     def save_figures(self):
         """
@@ -158,4 +158,4 @@ class Simulation:
         for name, fig in self.figures.items():
             fig.savefig(f'{self.path}/{name}.pdf')
 
-        print('Matplotlib figures saved to `results` folder.')
+        print(f'Matplotlib figures saved to `{self.path.name}` folder.')

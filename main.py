@@ -11,6 +11,10 @@ from bfblib import Simulation
 
 def main(args):
 
+    # Path to project folder is same as parameters directory
+    name = args.infile.split('/')[0]
+    path = pathlib.Path.cwd() / name
+
     # Get parameters from a Python module
     infile = args.infile.replace('/', '.')[:-3]
     params = importlib.import_module(infile)
@@ -22,17 +26,19 @@ def main(args):
 
     # Run simulation for parameters only then save results and figures
     if args.paramsfigs:
-        path = pathlib.Path.cwd() / 'results'
-        path.mkdir(exist_ok=True)
         sim = Simulation(params, path)
         sim.run_params()
 
     # Run a simulation for temperatures case
     if args.temps:
-        path = pathlib.Path.cwd() / 'results'
-        path.mkdir(exist_ok=True)
         sim = Simulation(params, path)
         sim.run_temps()
+
+    # Cleanup project directory
+    if args.clean:
+        for file in path.iterdir():
+            if file.suffix == '.pdf' or file.suffix == '.json':
+                file.unlink()
 
 
 if __name__ == '__main__':
@@ -45,11 +51,4 @@ if __name__ == '__main__':
     parser.add_argument('-c', '--clean', action='store_true', help='remove results folder')
     args = parser.parse_args()
 
-    if args.clean:
-        path = pathlib.Path.cwd() / 'results'
-        for file in path.iterdir():
-            file.unlink()
-        path.rmdir()
-        print('Deleted `results` folder.')
-    else:
-        main(args)
+    main(args)
