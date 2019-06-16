@@ -35,8 +35,6 @@ class BfbModel:
         us_umf_wenyu = self.calc_us_umf(us, umf_wenyu)
         zexp_wenyu = self.calc_zexp(umf_wenyu, us)
 
-        t_devol = self.calc_devol_time()
-
         # Store results from BFB model calculations
         self.results = {
             'gas_mw': round(self.gas.mw, 4),
@@ -49,21 +47,16 @@ class BfbModel:
             'zexp_ergun': round(zexp_ergun, 4),
             'umf_wenyu': round(umf_wenyu, 4),
             'us_umf_wenyu': round(us_umf_wenyu, 4),
-            'zexp_wenyu': round(zexp_wenyu, 4),
-            't_devol': round(t_devol, 4)
+            'zexp_wenyu': round(zexp_wenyu, 4)
         }
 
         # Store Matplotlib figures generated from BFB model results
         if build_figures:
-            fig_geldart = self.build_geldart_figure()
+            fig_geldart = self.plot_geldart_figure()
 
             self.figures = {
                 'fig_geldart': fig_geldart
             }
-
-    """
-    Fluidization methods.
-    """
 
     def calc_inner_ac(self):
         """
@@ -175,7 +168,7 @@ class BfbModel:
         zexp = zmf * fbexp
         return zexp
 
-    def build_geldart_figure(self):
+    def plot_geldart_figure(self):
         # Conversion for m = µm * 1e6
         # Conversion for g/cm³ = kg/m³ * 0.001
         dp = self.params.bed['dp'][0] * 1e6
@@ -185,18 +178,3 @@ class BfbModel:
         rhos = self.params.bed['rhos'] * 0.001
         fig = cm.geldart_chart(dp, rhog, rhos, dpmin, dpmax)
         return fig
-
-    """
-    Pyrolysis methods.
-    """
-
-    def calc_devol_time(self):
-        """
-        Returns
-        -------
-        tv : float
-            Devolatilization time of the biomass particle [s]
-        """
-        dp = self.params.biomass['dp_mean'] * 1000
-        tv = cm.devol_time(dp, self.gas.tk)
-        return tv

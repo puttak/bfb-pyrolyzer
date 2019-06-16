@@ -5,6 +5,7 @@ import textwrap
 from .gas import Gas
 from .bfb_model import BfbModel
 from .particle_model import ParticleModel
+from .pyrolysis_model import PyrolysisModel
 
 
 class Simulation:
@@ -23,23 +24,28 @@ class Simulation:
         gas = Gas(**self.params.gas)
         gas.calc_properties()
 
-        # BFB model for fluidization and biomass pyrolysis
+        # BFB model for fluidization
         bfb = BfbModel(gas, self.params)
 
         # Particle model for biomass intra-particle heat conduction
         prt = ParticleModel(gas, self.params)
 
+        # Pyrolysis model for biomass pyrolysis
+        pyro = PyrolysisModel(gas, self.params)
+
         if self.path is not None:
             bfb.solve(build_figures=True)
             prt.solve(build_figures=True)
-            self.results = {**bfb.results, **prt.results}
+            pyro.solve()
+            self.results = {**bfb.results, **prt.results, **pyro.results}
             self.figures = {**bfb.figures, **prt.figures}
             self.save_results()
             self.save_figures()
         else:
             bfb.solve()
             prt.solve()
-            self.results = {**bfb.results, **prt.results}
+            pyro.solve()
+            self.results = {**bfb.results, **prt.results, **pyro.results}
             self.print_parameters()
             self.print_results()
 
@@ -59,10 +65,21 @@ class Simulation:
             gas.tk = tk
             gas.calc_properties()
 
-            # BFB model for fluidization and biomass pyrolysis
+            # BFB model for fluidization
             bfb = BfbModel(gas, self.params)
             bfb.solve()
-            self.results_case.append(bfb.results)
+
+            # Particle model for biomass intra-particle heat conduction
+            prt = ParticleModel(gas, self.params)
+            prt.solve()
+
+            # Pyrolysis model for biomass pyrolysis
+            pyro = PyrolysisModel(gas, self.params)
+            pyro.solve()
+
+            # Store results for temperature
+            results = {'tk': tk, **bfb.results, **prt.results, **pyro.results}
+            self.results_case.append(results)
 
         print('Done.')
         self.save_results()
@@ -140,8 +157,11 @@ class Simulation:
         {'us_umf':<{w}} {self.results['us_umf_wenyu']:<{w}.2f} Us/Umf for gas and bed particles [-]
         {'zexp':<{w}} {self.results['zexp_wenyu']:<{w}.2f} Height of expanded bed [m]
 
-        {'t_devol':<{w}} {self.results['t_devol']:<{w}.2f} Devolatilization time for 95% conversion [s]
+        -------- Particle Model --------\n
         {'t_tkinf':<{w}} {self.results['t_tkinf']:<{w}.2f} Time for particle center to reach T∞ [s]
+
+        -------- Pyrolysis Model -------\n
+        {'t_devol':<{w}} {self.results['t_devol']:<{w}.2f} Devolatilization time for 95% conversion [s]
         """
         print(textwrap.dedent(res_string))
 

@@ -51,7 +51,7 @@ class Gas:
             self.mw = cm.mw(self.sp[0])
             self.mu = cm.mu_gas(self.sp[0], self.tk)
         else:
-            # gas mixture, multiple gas components
+            # gas mixture containing multiple gas components
             mws = []
             mus = []
             for i in range(n):

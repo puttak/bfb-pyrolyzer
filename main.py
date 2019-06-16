@@ -39,6 +39,7 @@ def main(args):
         for file in path.iterdir():
             if file.suffix == '.pdf' or file.suffix == '.json':
                 file.unlink()
+        print(f'Cleaned up files in `{name}` folder.')
 
 
 if __name__ == '__main__':
