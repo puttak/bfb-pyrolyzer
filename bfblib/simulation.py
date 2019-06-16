@@ -4,6 +4,7 @@ import textwrap
 
 from .gas import Gas
 from .bfb_model import BfbModel
+from .particle_model import ParticleModel
 
 
 class Simulation:
@@ -25,15 +26,20 @@ class Simulation:
         # BFB model for fluidization and biomass pyrolysis
         bfb = BfbModel(gas, self.params)
 
+        # Particle model for biomass intra-particle heat conduction
+        prt = ParticleModel(gas, self.params)
+
         if self.path is not None:
             bfb.solve(build_figures=True)
-            self.results = bfb.results
-            self.figures = bfb.figures
+            prt.solve(build_figures=True)
+            self.results = {**bfb.results, **prt.results}
+            self.figures = {**bfb.figures, **prt.figures}
             self.save_results()
             self.save_figures()
         else:
             bfb.solve()
-            self.results = bfb.results
+            prt.solve()
+            self.results = {**bfb.results, **prt.results}
             self.print_parameters()
             self.print_results()
 
