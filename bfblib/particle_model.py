@@ -1,5 +1,4 @@
 import numpy as np
-
 from .trans_heat_cond import hc2
 
 
@@ -74,7 +73,7 @@ class ParticleModel:
         t : float
             Time when biomass particle is near reactor temperature [s]
         """
-        tk_ref = self._gas.tk - 1                        # value near reactor temperature [K]
+        tk_ref = self._gas.tk - 1                       # value near reactor temperature [K]
         idx = np.where(tk_hc[:, 0] > tk_ref)[0][0]      # index where T > Tinf
         t_ref = t_hc[idx]                               # time where T > Tinf
         return t_ref

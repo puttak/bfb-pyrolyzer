@@ -20,6 +20,7 @@ bed = {
     'ep': 0.45,                         # Void fraction of bed [-]
     'phi': 0.86,                        # Sphericity of a bed particle [-]
     'rhos': 2500,                       # Density of a bed particle [kg/m³]
+    'rhos_char': 120,                   # Density of a char particle [kg/m³]
     'zmf': 0.1016                       # Bed height at minimum fluidization [m]
 }
 
@@ -33,6 +34,7 @@ biomass = {
     'h': 350,                  # Heat transfer coefficient for convection [W/m²K]
     'k': 0.12,                 # Thermal conductivity of loblolly pine [W/mK]
     'mc': 0.0,                 # Moisture content [%]
+    'phi': 0.6,                # Sphericity of biomass particle [-]
     'sg': 0.54,                # Specific gravity of loblolly pine [-]
     'tk_i': 293.15,            # Initial particle temperature [K]
     'b': 2,                    # Shape factor for particle transient heat conduction [-]

@@ -39,7 +39,7 @@ def main(args):
         for file in path.iterdir():
             if file.suffix == '.pdf':
                 file.unlink()
-        print(f'Cleaned up files in `{name}` folder.')
+        print(f'Cleaned up files in the `{name}` folder.')
 
 
 if __name__ == '__main__':

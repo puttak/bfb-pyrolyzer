@@ -1,3 +1,5 @@
+# TODO : put this function in Chemics package
+
 
 def heatcap(x, T):
     """

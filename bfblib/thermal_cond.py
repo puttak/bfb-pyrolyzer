@@ -1,3 +1,5 @@
+# TODO : put this function in the Chemics package
+
 
 def thermalcond(x, So, Gb):
     """

@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import numpy as np
 
 from .gas import Gas
@@ -6,7 +5,6 @@ from .bfb_model import BfbModel
 from .particle_model import ParticleModel
 from .pyrolysis_model import PyrolysisModel
 
-from .printer import print_header
 from .printer import print_parameters
 from .printer import print_gas_properties
 from .printer import print_bfb_results
@@ -15,99 +13,99 @@ from .printer import print_pyrolysis_results
 
 from .plotter import plot_geldart
 from .plotter import plot_intra_particle_heat_cond
+from .plotter import plot_umf_temps
+from .plotter import plot_tdevol_temps
+from .plotter import plot_ut_temps
 
 
 class Simulation:
 
     def __init__(self, params, path=None):
-        self.params = params
-        self.path = path
-        self.results = {}
-        self.figures = {}
-        self.results_case = []
+        self._params = params
+        self._path = path
 
     def run_params(self):
 
         # Gas properties
         # Note that gas mixture uses the Herning calculation for viscosity
-        gas = Gas(**self.params.gas)
+        gas = Gas(**self._params.gas)
         gas.calc_properties()
 
         # BFB model for fluidization
-        bfb = BfbModel(gas, self.params)
-        bfb.solve_params()
+        bfb = BfbModel(gas, self._params)
+        bfb.solve()
 
         # Particle model for biomass intra-particle heat conduction
-        part = ParticleModel(gas, self.params)
+        part = ParticleModel(gas, self._params)
         part.solve()
 
         # Pyrolysis model for biomass pyrolysis
-        pyro = PyrolysisModel(gas, self.params)
+        pyro = PyrolysisModel(gas, self._params)
         pyro.solve()
 
         # Print parameters to screen
-        print_header('Parameters')
-        print_parameters(self.params)
+        print(f"\n{' Parameters ':*^40}")
+        print_parameters(self._params)
 
         # Print results to screen
-        print_header('Results')
+        print(f"{' Results from Parameters ':*^40}")
         print_gas_properties(gas)
         print_bfb_results(bfb)
         print_particle_results(part)
         print_pyrolysis_results(pyro)
 
         # Create and save plot figures if path is defined
-        if self.path is not None:
-            plot_geldart(gas, self.params, self.path)
-            plot_intra_particle_heat_cond(part, self.path)
+        if self._path is not None:
+            plot_geldart(gas, self._params, self._path)
+            plot_intra_particle_heat_cond(part, self._path)
 
     def run_temps(self):
+        print(f"\n{' Simulate Temperatures ':*^40}\n")
 
-        print('>>>>>>>> Simulate Temperatures <<<<<<<<')
-        tk_min = self.params.case['tk'][0]
-        tk_max = self.params.case['tk'][1]
+        tk_ref = self._params.gas['tk']
+        tk_min = self._params.case['tk'][0]
+        tk_max = self._params.case['tk'][1]
         tks = np.arange(tk_min, tk_max + 10, 10)
 
-        umf_ergun = []
-        umf_wenyu = []
+        umfs_ergun = []
+        umfs_wenyu = []
+        uts_bed_ganser = []
+        uts_bed_haider = []
+        uts_bio_ganser = []
+        uts_bio_haider = []
+        uts_char_ganser = []
+        uts_char_haider = []
+        ts_devol = []
 
         for tk in tks:
-            print(f'Running case at {tk} K ...')
+            print(f'Run case at {tk} K ...')
 
             # Gas properties
             # Note that gas mixture uses the Herning calculation for viscosity
-            gas = Gas(**self.params.gas)
+            gas = Gas(**self._params.gas)
             gas.tk = tk
             gas.calc_properties()
 
             # BFB model for fluidization
-            bfb = BfbModel(gas, self.params)
+            bfb = BfbModel(gas, self._params)
 
-            # Store Umf at temperature
-            umf_ergun.append(bfb.calc_umf_ergun(gas.mu))
-            umf_wenyu.append(bfb.calc_umf_wenyu(gas.mu))
+            # Pyrolysis model for biomass pyrolysis
+            pyro = PyrolysisModel(gas, self._params)
+            t_devol = pyro.calc_devol_time()
 
-            # # Particle model for biomass intra-particle heat conduction
-            # prt = ParticleModel(gas, self.params)
-            # prt.solve()
+            # Store results at temperature
+            umfs_ergun.append(bfb.calc_umf_ergun())
+            umfs_wenyu.append(bfb.calc_umf_wenyu())
+            uts_bed_ganser.append(bfb.calc_ut_ganser()[0])
+            uts_bed_haider.append(bfb.calc_ut_haider()[0])
+            uts_bio_ganser.append(bfb.calc_ut_ganser()[1])
+            uts_bio_haider.append(bfb.calc_ut_haider()[1])
+            uts_char_ganser.append(bfb.calc_ut_ganser()[2])
+            uts_char_haider.append(bfb.calc_ut_haider()[2])
+            ts_devol.append(t_devol)
 
-            # # Pyrolysis model for biomass pyrolysis
-            # pyro = PyrolysisModel(gas, self.params)
-            # pyro.solve()
+        plot_umf_temps(tks, umfs_ergun, umfs_wenyu, tk_ref, self._path)
+        plot_ut_temps(tks, uts_bed_ganser, uts_bed_haider, uts_bio_ganser, uts_bio_haider, uts_char_ganser, uts_char_haider, tk_ref, self._path)
+        plot_tdevol_temps(tks, ts_devol, tk_ref, self._path)
 
-            # # Store results for temperature
-            # results = {'tk': tk, **bfb.results, **prt.results, **pyro.results}
-            # self.results_case.append(results)
-
-        fig, ax = plt.subplots(tight_layout=True)
-        ax.plot(tks, umf_ergun, '.-', label='Ergun')
-        ax.plot(tks, umf_wenyu, '.-', label="WenYu")
-        ax.fill_between(tks, umf_ergun, umf_wenyu, facecolor='0.9')
-        ax.grid(color='0.9')
-        ax.legend(loc='best')
-        ax.set_frame_on(False)
-        ax.set_xlabel('Temperature [K]')
-        ax.set_ylabel('Umf [m/s]')
-        ax.tick_params(color='0.9')
-
-        plt.show()
+        print(f'Matplotlib figures saved to the `{self._path.name}` folder.\n')
