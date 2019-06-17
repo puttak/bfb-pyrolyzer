@@ -15,48 +15,45 @@ class BfbModel:
         params : module
             Parameters for model calculations.
         """
-        self.gas = gas
-        self.params = params
-        self.results = {}
-        self.figures = {}
+        self._gas = gas
+        self._params = params
 
-    def solve(self, build_figures=False):
+        self.ac = None
+        self.us = None
+
+        self.umf_ergun = None
+        self.us_umf_ergun = None
+        self.zexp_ergun = None
+
+        self.umf_wenyu = None
+        self.us_umf_wenyu = None
+        self.zexp_wenyu = None
+
+    def solve_params(self):
         """
         Solve BFB model and store results.
         """
+        mug = self._gas.mu
         ac = self.calc_inner_ac()
         us = self.calc_us(ac)
 
-        umf_ergun = self.calc_umf_ergun(self.gas.mu)
+        umf_ergun = self.calc_umf_ergun(mug)
         us_umf_ergun = self.calc_us_umf(us, umf_ergun)
         zexp_ergun = self.calc_zexp(umf_ergun, us)
 
-        umf_wenyu = self.calc_umf_wenyu(self.gas.mu)
+        umf_wenyu = self.calc_umf_wenyu(mug)
         us_umf_wenyu = self.calc_us_umf(us, umf_wenyu)
         zexp_wenyu = self.calc_zexp(umf_wenyu, us)
 
-        # Store results from BFB model calculations
-        self.results = {
-            'gas_mw': round(self.gas.mw, 4),
-            'gas_mu': round(self.gas.mu, 4),
-            'gas_rho': round(self.gas.rho, 4),
-            'ac': round(ac, 4),
-            'us': round(us, 4),
-            'umf_ergun': round(umf_ergun, 4),
-            'us_umf_ergun': round(us_umf_ergun, 4),
-            'zexp_ergun': round(zexp_ergun, 4),
-            'umf_wenyu': round(umf_wenyu, 4),
-            'us_umf_wenyu': round(us_umf_wenyu, 4),
-            'zexp_wenyu': round(zexp_wenyu, 4)
-        }
-
-        # Store Matplotlib figures generated from BFB model results
-        if build_figures:
-            fig_geldart = self.plot_geldart_figure()
-
-            self.figures = {
-                'fig_geldart': fig_geldart
-            }
+        # Assign values to class attributes
+        self.ac = ac
+        self.us = us
+        self.umf_ergun = umf_ergun
+        self.us_umf_ergun = us_umf_ergun
+        self.zexp_ergun = zexp_ergun
+        self.umf_wenyu = umf_wenyu
+        self.us_umf_wenyu = us_umf_wenyu
+        self.zexp_wenyu = zexp_wenyu
 
     def calc_inner_ac(self):
         """
@@ -65,7 +62,7 @@ class BfbModel:
         ac : float
             Inner cross section area of the rector [m²]
         """
-        di = self.params.reactor['di']
+        di = self._params.reactor['di']
         ac = (np.pi * di**2) / 4
         return ac
 
@@ -81,8 +78,8 @@ class BfbModel:
         us : float
             Superficial gas velocity [m/s]
         """
-        p_kpa = self.gas.p / 1000
-        q_lpm = cm.slm_to_lpm(self.gas.q, p_kpa, self.gas.tk)
+        p_kpa = self._gas.p / 1000
+        q_lpm = cm.slm_to_lpm(self._gas.q, p_kpa, self._gas.tk)
         q_m3s = q_lpm / 60_000
         us = q_m3s / ac
         return us
@@ -100,12 +97,12 @@ class BfbModel:
             Minimum fluidization velocity based on Ergun equation [m/s]
         """
         # Conversion for kg/ms = µP * 1e-7
-        dp = self.params.bed['dp'][0]
-        ep = self.params.bed['ep']
+        dp = self._params.bed['dp'][0]
+        ep = self._params.bed['ep']
         mug = mug * 1e-7
-        phi = self.params.bed['phi']
-        rhog = self.gas.rho
-        rhos = self.params.bed['rhos']
+        phi = self._params.bed['phi']
+        rhog = self._gas.rho
+        rhos = self._params.bed['rhos']
         umf = cm.umf_ergun(dp, ep, mug, phi, rhog, rhos)
         return umf
 
@@ -121,10 +118,10 @@ class BfbModel:
         umf : float
             Minimum fluidization velocity based on Wen and Yu equation [m/s]
         """
-        dp = self.params.bed['dp'][0]
+        dp = self._params.bed['dp'][0]
         mug = mug * 1e-7
-        rhog = self.gas.rho
-        rhos = self.params.bed['rhos']
+        rhog = self._gas.rho
+        rhos = self._params.bed['rhos']
         umf = cm.umf_coeff(dp, mug, rhog, rhos, coeff='wenyu')
         return umf
 
@@ -159,22 +156,11 @@ class BfbModel:
         zexp : float
             Bed expansion height [m]
         """
-        di = self.params.reactor['di']
-        dp = self.params.bed['dp'][0]
-        rhog = self.gas.rho
-        rhos = self.params.bed['rhos']
-        zmf = self.params.bed['zmf']
+        di = self._params.reactor['di']
+        dp = self._params.bed['dp'][0]
+        rhog = self._gas.rho
+        rhos = self._params.bed['rhos']
+        zmf = self._params.bed['zmf']
         fbexp = cm.fbexp(di, dp, rhog, rhos, umf, us)
         zexp = zmf * fbexp
         return zexp
-
-    def plot_geldart_figure(self):
-        # Conversion for m = µm * 1e6
-        # Conversion for g/cm³ = kg/m³ * 0.001
-        dp = self.params.bed['dp'][0] * 1e6
-        dpmin = self.params.bed['dp'][1] * 1e6
-        dpmax = self.params.bed['dp'][2] * 1e6
-        rhog = self.gas.rho * 0.001
-        rhos = self.params.bed['rhos'] * 0.001
-        fig = cm.geldart_chart(dp, rhog, rhos, dpmin, dpmax)
-        return fig

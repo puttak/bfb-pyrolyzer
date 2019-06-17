@@ -24,7 +24,7 @@ def main(args):
         sim = Simulation(params)
         sim.run_params()
 
-    # Run simulation for parameters only then save results and figures
+    # Run simulation for parameters only then save figures
     if args.paramsfigs:
         sim = Simulation(params, path)
         sim.run_params()
@@ -37,7 +37,7 @@ def main(args):
     # Cleanup project directory
     if args.clean:
         for file in path.iterdir():
-            if file.suffix == '.pdf' or file.suffix == '.json':
+            if file.suffix == '.pdf':
                 file.unlink()
         print(f'Cleaned up files in `{name}` folder.')
 
