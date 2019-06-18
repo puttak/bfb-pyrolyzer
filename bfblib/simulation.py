@@ -67,14 +67,19 @@ class Simulation:
         tk_max = self._params.case['tk'][1]
         tks = np.arange(tk_min, tk_max + 10, 10)
 
+        # Store Umf at each temperature from Ergun and WenYu
         umfs_ergun = []
         umfs_wenyu = []
+
+        # Store Ut at each temperature from Ganser and Haider
         uts_bed_ganser = []
         uts_bed_haider = []
         uts_bio_ganser = []
         uts_bio_haider = []
         uts_char_ganser = []
         uts_char_haider = []
+
+        # Store devolatilization time for each temperature
         ts_devol = []
 
         for tk in tks:
@@ -93,7 +98,7 @@ class Simulation:
             pyro = PyrolysisModel(gas, self._params)
             t_devol = pyro.calc_devol_time()
 
-            # Store results at temperature
+            # Append results for each temperature
             umfs_ergun.append(bfb.calc_umf_ergun())
             umfs_wenyu.append(bfb.calc_umf_wenyu())
             uts_bed_ganser.append(bfb.calc_ut_ganser()[0])
@@ -104,8 +109,11 @@ class Simulation:
             uts_char_haider.append(bfb.calc_ut_haider()[2])
             ts_devol.append(t_devol)
 
+        uts_ganser = {'bed': uts_bed_ganser, 'bio': uts_bio_ganser, 'char': uts_char_ganser}
+        uts_haider = {'bed': uts_bed_haider, 'bio': uts_bio_haider, 'char': uts_char_haider}
+
         plot_umf_temps(tks, umfs_ergun, umfs_wenyu, tk_ref, self._path)
-        plot_ut_temps(tks, uts_bed_ganser, uts_bed_haider, uts_bio_ganser, uts_bio_haider, uts_char_ganser, uts_char_haider, tk_ref, self._path)
+        plot_ut_temps(tks, uts_ganser, uts_haider, self._path)
         plot_tdevol_temps(tks, ts_devol, tk_ref, self._path)
 
         print(f'Matplotlib figures saved to the `{self._path.name}` folder.\n')
