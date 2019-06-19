@@ -36,6 +36,7 @@ def print_parameters(params):
 
     {' Reactor ':-^40}\n
     {'di':<{w}} {params.reactor['di']:<{w}} Inner diameter of reactor [m]
+    {'ht':<{w}} {params.reactor['ht']:<{w}} Total height of reactor [m]
     """
     print(textwrap.dedent(pm_string))
 
@@ -59,13 +60,15 @@ def print_bfb_results(results):
     """
     Print BFB model results.
     """
-    ac, us, umf, us_umf, zexp, ut_bed, ut_bio, ut_char = results
+    ac, us, tdh, umf, us_umf, zexp, ut_bed, ut_bio, ut_char = results
     w = 12  # width specifier
 
     bfb_string = f"""
     {' BFB Model ':-^40}\n
     {'ac':<{w}} {ac:<{w}.4f} Inner cross section area [m²]
     {'us':<{w}} {us:<{w}.4f} Superficial gas velocity [m/s]
+    {'tdh_chan':<{w}} {tdh.chan:<{w}.4f} Transport disengaging Height [m]
+    {'tdh_horio':<{w}} {tdh.horio:<{w}.4f} Transport disengaging Height [m]
 
     Ergun
     {'umf':<{w}} {umf.ergun:<{w}.4f} Minimum fluidization velocity [m/s]
@@ -92,27 +95,29 @@ def print_bfb_results(results):
     print(textwrap.dedent(bfb_string))
 
 
-def print_particle_results(particle):
+def print_particle_results(results):
     """
     Print particle model results.
     """
+    t_hc, tk_hc, t_tkinf = results
     w = 12  # width specifier
 
     particle_string = f"""
     {' Particle Model ':-^40}\n
-    {'t_tkinf':<{w}} {particle.t_tkinf:<{w}.2f} Time for particle center to reach T∞ [s]
+    {'t_tkinf':<{w}} {t_tkinf:<{w}.2f} Time for particle center to reach T∞ [s]
     """
     print(textwrap.dedent(particle_string))
 
 
-def print_pyrolysis_results(pyrolysis):
+def print_pyrolysis_results(results):
     """
     Print pyrolysis model results.
     """
+    t_devol, = results
     w = 12  # width specifier
 
     res_string = f"""
     {' Pyrolysis Model ':-^40}\n
-    {'t_devol':<{w}} {pyrolysis.t_devol:<{w}.2f} Devolatilization time for 95% conversion [s]
+    {'t_devol':<{w}} {t_devol:<{w}.2f} Devolatilization time for 95% conversion [s]
     """
     print(textwrap.dedent(res_string))

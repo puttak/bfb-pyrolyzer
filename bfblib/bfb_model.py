@@ -2,11 +2,11 @@ import chemics as cm
 import numpy as np
 from collections import namedtuple
 
-
+Tdh = namedtuple('Tdh', 'chan horio')
 Umf = namedtuple('Umf', 'ergun wenyu')
 UsUmf = namedtuple('UsUmf', 'ergun wenyu')
-Zexp = namedtuple('Zexp', 'ergun wenyu')
 Ut = namedtuple('Ut', 'ganser haider')
+Zexp = namedtuple('Zexp', 'ergun wenyu')
 
 
 class BfbModel:
@@ -100,6 +100,16 @@ class BfbModel:
         ut_haider = cm.ut_haider(dp, mug, phi, rhog, rhos)
         ut = Ut(ut_ganser, ut_haider)
         return ut
+
+    def calc_tdh(self, us):
+        """
+        here
+        """
+        di = self._params.reactor['di']
+        tdh_chan = 0.85 * (us**1.2) * (7.33 - 1.2 * np.log(us))
+        tdh_horio = ((2.7 * di ** -0.36) - 0.7) * di * np.exp(0.74 * us * di ** -0.23)
+        tdh = Tdh(tdh_chan, tdh_horio)
+        return tdh
 
     def calc_us_umf(self, umf, us):
         """

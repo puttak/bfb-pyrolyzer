@@ -24,12 +24,12 @@ def main(args):
         sim = Simulation(params)
         sim.run_params()
 
-    # Run simulation for parameters only then save figures
-    if args.paramsfigs:
+    # Run simulation for parameters only and save figures to path
+    if args.params and args.figs:
         sim = Simulation(params, path)
         sim.run_params()
 
-    # Run a simulation for temperatures case
+    # Run a simulation for temperatures case and save figures to path
     if args.temps:
         sim = Simulation(params, path)
         sim.run_temps()
@@ -47,8 +47,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('infile', help='path to parameters module file')
     parser.add_argument('-p', '--params', action='store_true', help='run parameters only')
-    parser.add_argument('-pf', '--paramsfigs', action='store_true', help='run parameters only then save results and figures')
     parser.add_argument('-t', '--temps', action='store_true', help='run temperatures case')
+    parser.add_argument('-f', '--figs', action='store_true', help='build and save plot figures')
     parser.add_argument('-c', '--clean', action='store_true', help='remove results folder')
     args = parser.parse_args()
 

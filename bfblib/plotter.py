@@ -26,18 +26,16 @@ def plot_geldart(gas, params, path):
     fig.savefig(f'{path}/fig_geldart.pdf')
 
 
-def plot_intra_particle_heat_cond(particle, path):
+def plot_intra_particle_heat_cond(results, path):
     """
     here
     """
-    t = particle.t_hc
-    tk = particle.tk_hc
-    t_tkinf = particle.t_tkinf
+    t_hc, tk_hc, t_tkinf = results
 
     fig, ax = plt.subplots(tight_layout=True)
-    ax.plot(t, tk[:, 0], lw=2, label='center')
-    ax.plot(t, tk[:, -1], lw=2, label='surface')
-    ax.axvline(t_tkinf, alpha=0.5, c='k', ls='--', label='Tinf')
+    ax.plot(t_hc, tk_hc[:, 0], lw=2, label='center')
+    ax.plot(t_hc, tk_hc[:, -1], lw=2, label='surface')
+    ax.axvline(t_tkinf, c='k', ls='--', label='Tinf')
     _config(ax, 'Time [s]', 'Temperature [K]')
     fig.savefig(f'{path}/fig_intra_hc.pdf')
 

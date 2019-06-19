@@ -47,16 +47,17 @@ biomass = {
 # ----------------------------------------------------------------------------
 
 gas = {
-    'p': 101_325,              # Gas pressure in reactor [Pa]
-    'q': 14,                   # Volumetric flowrate of gas into reactor [SLM]
-    'sp': ['H2', 'N2'],        # Gas species of each component in gas mixture [-]
-    'tk': 773.15,              # Gas temperature in reactor [K]
-    'x': [0.85, 0.15]          # Mole fraction of each component in gas mixture [-]
+    'p': 101_325,           # Gas pressure in reactor [Pa]
+    'q': 14,                # Volumetric flowrate of gas into reactor [SLM]
+    'sp': ['H2', 'N2'],     # Gas species of each component in gas mixture [-]
+    'tk': 773.15,           # Gas temperature in reactor [K]
+    'x': [0.85, 0.15]       # Mole fraction of each component in gas mixture [-]
 }
 
 # Reactor Geometry
 # ----------------------------------------------------------------------------
 
 reactor = {
-    'di': 0.05232              # Inner diameter of reactor [m]
+    'di': 0.05232,      # Inner diameter of reactor [m]
+    'ht': 0.4318        # Total height of reactor [m]
 }

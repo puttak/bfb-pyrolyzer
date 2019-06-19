@@ -8,23 +8,6 @@ class ParticleModel:
         self._gas = gas
         self._params = params
 
-        self.t_hc = None
-        self.tk_hc = None
-        self.t_tkinf = None
-
-    def solve(self, build_figures=False):
-        """
-        Solve particle model and store results.
-        """
-        t_hc = self.build_time_vector()
-        tk_hc = self.calc_trans_hc(t_hc, self._gas.tk)
-        t_tkinf = self.calc_time_tkinf(t_hc, tk_hc)
-
-        # Assign values to class attributes
-        self.t_hc = t_hc
-        self.tk_hc = tk_hc
-        self.t_tkinf = t_tkinf
-
     def build_time_vector(self):
         """
         Returns

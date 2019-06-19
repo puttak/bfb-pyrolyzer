@@ -7,15 +7,6 @@ class PyrolysisModel:
         self._gas = gas
         self._params = params
 
-        self.t_devol = None
-
-    def solve(self):
-        """
-        Solve pyrolysis model and store results.
-        """
-        t_devol = self.calc_devol_time()
-        self.t_devol = t_devol
-
     def calc_devol_time(self):
         """
         Returns
