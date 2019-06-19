@@ -55,38 +55,39 @@ def print_gas_properties(gas):
     print(textwrap.dedent(gas_string))
 
 
-def print_bfb_results(bfb):
+def print_bfb_results(results):
     """
     Print BFB model results.
     """
+    ac, us, umf, us_umf, zexp, ut_bed, ut_bio, ut_char = results
     w = 12  # width specifier
 
     bfb_string = f"""
     {' BFB Model ':-^40}\n
-    {'ac':<{w}} {bfb.ac:<{w}.4f} Inner cross section area [m²]
-    {'us':<{w}} {bfb.us:<{w}.4f} Superficial gas velocity [m/s]
+    {'ac':<{w}} {ac:<{w}.4f} Inner cross section area [m²]
+    {'us':<{w}} {us:<{w}.4f} Superficial gas velocity [m/s]
 
     Ergun
-    {'umf':<{w}} {bfb.umf_ergun:<{w}.4f} Minimum fluidization velocity [m/s]
-    {'us_umf':<{w}} {bfb.us_umf_ergun:<{w}.2f} Us/Umf for gas and bed particles [-]
-    {'zexp':<{w}} {bfb.zexp_ergun:<{w}.2f} Height of expanded bed [m]
+    {'umf':<{w}} {umf.ergun:<{w}.4f} Minimum fluidization velocity [m/s]
+    {'us_umf':<{w}} {us_umf.ergun:<{w}.2f} Us/Umf for gas and bed particles [-]
+    {'zexp':<{w}} {zexp.ergun:<{w}.2f} Height of expanded bed [m]
 
     Wen and Yu
-    {'umf':<{w}} {bfb.umf_wenyu:<{w}.4f} Minimum fluidization velocity [m/s]
-    {'us_umf':<{w}} {bfb.us_umf_wenyu:<{w}.2f} Us/Umf for gas and bed particles [-]
-    {'zexp':<{w}} {bfb.zexp_wenyu:<{w}.2f} Height of expanded bed [m]
+    {'umf':<{w}} {umf.wenyu:<{w}.4f} Minimum fluidization velocity [m/s]
+    {'us_umf':<{w}} {us_umf.wenyu:<{w}.2f} Us/Umf for gas and bed particles [-]
+    {'zexp':<{w}} {zexp.wenyu:<{w}.2f} Height of expanded bed [m]
 
     Bed material
-    {'ut_ganser':<{w}} {bfb.ut_ganser[0]:<{w}.2f} Terminal velocity [m/s]
-    {'ut_haider':<{w}} {bfb.ut_haider[0]:<{w}.2f} Terminal velocity [m/s]
+    {'ut_ganser':<{w}} {ut_bed.ganser:<{w}.2f} Terminal velocity [m/s]
+    {'ut_haider':<{w}} {ut_bed.haider:<{w}.2f} Terminal velocity [m/s]
 
     Biomass material
-    {'ut_ganser':<{w}} {bfb.ut_ganser[1]:<{w}.2f} Terminal velocity [m/s]
-    {'ut_haider':<{w}} {bfb.ut_haider[1]:<{w}.2f} Terminal velocity [m/s]
+    {'ut_ganser':<{w}} {ut_bio.ganser:<{w}.2f} Terminal velocity [m/s]
+    {'ut_haider':<{w}} {ut_bio.haider:<{w}.2f} Terminal velocity [m/s]
 
     Char material
-    {'ut_ganser':<{w}} {bfb.ut_ganser[2]:<{w}.2f} Terminal velocity [m/s]
-    {'ut_haider':<{w}} {bfb.ut_haider[2]:<{w}.2f} Terminal velocity [m/s]
+    {'ut_ganser':<{w}} {ut_char.ganser:<{w}.2f} Terminal velocity [m/s]
+    {'ut_haider':<{w}} {ut_char.haider:<{w}.2f} Terminal velocity [m/s]
     """
     print(textwrap.dedent(bfb_string))
 

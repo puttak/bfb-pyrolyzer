@@ -33,7 +33,18 @@ class Simulation:
 
         # BFB model for fluidization
         bfb = BfbModel(gas, self._params)
-        bfb.solve()
+        ac = bfb.ac
+        us = bfb.calc_us()
+
+        umf = bfb.calc_umf()
+        us_umf = bfb.calc_us_umf(umf, us)
+        zexp = bfb.calc_zexp(umf, us)
+
+        ut_bed = bfb.calc_ut_bed()
+        ut_bio = bfb.calc_ut_biomass()
+        ut_char = bfb.calc_ut_char()
+
+        results_bfb = (ac, us, umf, us_umf, zexp, ut_bed, ut_bio, ut_char)
 
         # Particle model for biomass intra-particle heat conduction
         part = ParticleModel(gas, self._params)
@@ -50,7 +61,7 @@ class Simulation:
         # Print results to screen
         print(f"{' Results from Parameters ':*^40}")
         print_gas_properties(gas)
-        print_bfb_results(bfb)
+        print_bfb_results(results_bfb)
         print_particle_results(part)
         print_pyrolysis_results(pyro)
 
