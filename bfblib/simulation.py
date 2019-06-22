@@ -28,8 +28,7 @@ class Simulation:
 
         # Gas properties
         # Note that gas mixture uses the Herning calculation for viscosity
-        gas = Gas(**self._params.gas)
-        gas.calc_properties()
+        gas = Gas(self._params.gas)
 
         # BFB model for fluidization
         bfb = BfbModel(gas, self._params)
@@ -104,9 +103,8 @@ class Simulation:
 
             # Gas properties
             # Note that gas mixture uses the Herning calculation for viscosity
-            gas = Gas(**self._params.gas)
-            gas.tk = tk
-            gas.calc_properties()
+            gas = Gas(self._params.gas)
+            gas.update_temperature(tk)
 
             # BFB model for fluidization
             bfb = BfbModel(gas, self._params)

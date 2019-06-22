@@ -1,8 +1,6 @@
 import chemics as cm
-from dataclasses import dataclass
 
 
-@dataclass
 class Gas:
     """
     Gas or gas mixture properties.
@@ -11,8 +9,6 @@ class Gas:
     ----------
     p : float
         Pressure [Pa]
-    q : float
-        Volumetric flow rate [SLM]
     sp : list
         Species representing gas or gas mixture.
     tk : float
@@ -26,45 +22,68 @@ class Gas:
     rho : float
         Density [kg/m³]
     """
-    p: float
-    q: float
-    sp: list
-    tk: float
-    x: list
-    mw: float = 0
-    mu: float = 0
-    rho: float = 0
 
-    def calc_properties(self, mu_method='herning'):
+    def __init__(self, params, eq='herning'):
+        self.p = params['p']
+        self.sp = params['sp']
+        self.tk = params['tk']
+        self.x = params['x']
+        self._eq = eq
+        self._n = len(params['sp'])
+        self._calc_mw()
+        self._calc_rho()
+        self._calc_mu()
+
+    def _calc_mw(self):
         """
-        Determine gas or gas mixture properties.
-
-        Parameters
-        ----------
-        mu_method : str, optional
-            Method used to calculate gas mixture viscosity.
+        Calculate molecular weight based on number of gas species.
         """
-        n = len(self.sp)
-
-        if n == 1:
-            # single gas component
-            self.mw = cm.mw(self.sp[0])
-            self.mu = cm.mu_gas(self.sp[0], self.tk)
+        if self._n == 1:
+            mw = cm.mw(self.sp[0])
         else:
-            # gas mixture containing multiple gas components
+            mws = []
+            for i in range(self._n):
+                mw = cm.mw(self.sp[i])
+                mws.append(mw)
+            mw = cm.mw_mix(mws, self.x)
+        self.mw = mw
+
+    def _calc_rho(self):
+        """
+        Calculate gas density.
+        """
+        rho = cm.rhog(self.mw, self.p, self.tk)
+        self.rho = rho
+
+    def _calc_mu(self):
+        """
+        Calculate gas viscosity based on number of gas species.
+        """
+        if self._n == 1:
+            mu = cm.mu_gas(self.sp[0], self.tk)
+            self.mu = mu
+        else:
             mws = []
             mus = []
-            for i in range(n):
+
+            for i in range(self._n):
                 mw = cm.mw(self.sp[i])
                 mu = cm.mu_gas(self.sp[i], self.tk)
                 mws.append(mw)
                 mus.append(mu)
-            self.mw = cm.mw_mix(mws, self.x)
-            if mu_method == 'graham':
-                self.mu = cm.mu_graham(mus, self.x)
-            elif mu_method == 'herning':
-                self.mu = cm.mu_herning(mus, mws, self.x)
-            else:
-                raise ValueError(f'Viscosity method `{mu_method}` not available.')
 
-        self.rho = cm.rhog(self.mw, self.p, self.tk)
+            if self._eq == 'graham':
+                mu = cm.mu_graham(mus, self.x)
+            elif self._eq == 'herning':
+                mu = cm.mu_herning(mus, mws, self.x)
+            else:
+                raise ValueError(f'Viscosity equation `{self._eq}` not available.')
+            self.mu = mu
+
+    def update_temperature(self, tk):
+        """
+        Update gas properties based on temperature.
+        """
+        self.tk = tk
+        self._calc_rho()
+        self._calc_mu()

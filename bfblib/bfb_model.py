@@ -33,7 +33,7 @@ class BfbModel:
             Superficial gas velocity [m/s]
         """
         p_kpa = self._gas.p / 1000
-        q_lpm = cm.slm_to_lpm(self._gas.q, p_kpa, self._gas.tk)
+        q_lpm = cm.slm_to_lpm(self._params.reactor['q'], p_kpa, self._gas.tk)
         q_m3s = q_lpm / 60_000
         us = q_m3s / self.ac
         return us

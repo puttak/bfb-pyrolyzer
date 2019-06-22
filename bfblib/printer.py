@@ -29,7 +29,6 @@ def print_parameters(params):
 
     {' Gas ':-^40}\n
     {'p':<{w}} {params.gas['p']:<{w},} Gas pressure in reactor [Pa]
-    {'q':<{w}} {params.gas['q']:<{w}} Volumetric flowrate of gas into reactor [SLM]
     {'sp':<{w}} {sp:<{w}} Comionents of gas mixture [-]
     {'tk':<{w}} {params.gas['tk']:<{w}} Gas temperature in reactor [K]
     {'x':<{w}} {x:<{w}} Mole fractions of components in gas mixture [-]
@@ -37,6 +36,7 @@ def print_parameters(params):
     {' Reactor ':-^40}\n
     {'di':<{w}} {params.reactor['di']:<{w}} Inner diameter of reactor [m]
     {'ht':<{w}} {params.reactor['ht']:<{w}} Total height of reactor [m]
+    {'q':<{w}} {params.reactor['q']:<{w}} Volumetric flowrate of gas into reactor [SLM]
     """
     print(textwrap.dedent(pm_string))
 
@@ -51,8 +51,7 @@ def print_gas_properties(gas):
     {' Gas Properties ':-^40}\n
     {'mw':<{w}} {gas.mw:<{w}.4f} Molecular weight [g/mol]
     {'mu':<{w}} {gas.mu:<{w}.2f} Viscosity [µP]
-    {'rho':<{w}} {gas.rho:<{w}.4f} Density [kg/m³]
-    """
+    {'rho':<{w}} {gas.rho:<{w}.4f} Density [kg/m³]"""
     print(textwrap.dedent(gas_string))
 
 
@@ -90,8 +89,7 @@ def print_bfb_results(results):
 
     Char material
     {'ut_ganser':<{w}} {ut_char.ganser:<{w}.2f} Terminal velocity [m/s]
-    {'ut_haider':<{w}} {ut_char.haider:<{w}.2f} Terminal velocity [m/s]
-    """
+    {'ut_haider':<{w}} {ut_char.haider:<{w}.2f} Terminal velocity [m/s]"""
     print(textwrap.dedent(bfb_string))
 
 
@@ -104,8 +102,7 @@ def print_particle_results(results):
 
     particle_string = f"""
     {' Particle Model ':-^40}\n
-    {'t_tkinf':<{w}} {t_tkinf:<{w}.2f} Time for particle center to reach T∞ [s]
-    """
+    {'t_tkinf':<{w}} {t_tkinf:<{w}.2f} Time for particle center to reach T∞ [s]"""
     print(textwrap.dedent(particle_string))
 
 
