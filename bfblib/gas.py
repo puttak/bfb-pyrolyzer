@@ -24,19 +24,19 @@ class Gas:
     """
 
     def __init__(self, params, eq='herning'):
-        self.p = params['p']
-        self.sp = params['sp']
-        self.tk = params['tk']
-        self.x = params['x']
+        self.p = params.gas['p']
+        self.sp = params.gas['sp']
+        self.tk = params.gas['tk']
+        self.x = params.gas['x']
         self._eq = eq
-        self._n = len(params['sp'])
+        self._n = len(params.gas['sp'])
         self._calc_mw()
         self._calc_rho()
         self._calc_mu()
 
     def _calc_mw(self):
         """
-        Calculate molecular weight based on number of gas species.
+        Calculate molecular weight [g/mol] based on number of gas species.
         """
         if self._n == 1:
             mw = cm.mw(self.sp[0])
@@ -50,14 +50,14 @@ class Gas:
 
     def _calc_rho(self):
         """
-        Calculate gas density.
+        Calculate gas density [kg/m³].
         """
         rho = cm.rhog(self.mw, self.p, self.tk)
         self.rho = rho
 
     def _calc_mu(self):
         """
-        Calculate gas viscosity based on number of gas species.
+        Calculate gas viscosity [µP] based on number of gas species.
         """
         if self._n == 1:
             mu = cm.mu_gas(self.sp[0], self.tk)

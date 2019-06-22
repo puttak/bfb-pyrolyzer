@@ -24,6 +24,7 @@ def print_parameters(params):
     {'h':<{w}} {params.biomass['h']:<{w}} Heat transfer coefficient for convection [W/m²K]
     {'k':<{w}} {params.biomass['k']:<{w}} Thermal conductivity of loblolly pine [W/mK]
     {'mc':<{w}} {params.biomass['mc']:<{w}} Moisture content [%]
+    {'phi':<{w}} {params.biomass['phi']:<{w}} Particle sphericity [-]
     {'sg':<{w}} {params.biomass['sg']:<{w}} Specific gravity of loblolly pine [-]
     {'tk_i':<{w}} {params.biomass['tk_i']:<{w}} Initial particle temperature [K]
 
@@ -55,66 +56,63 @@ def print_gas_properties(gas):
     print(textwrap.dedent(gas_string))
 
 
-def print_bfb_results(results):
+def print_bfb_results(bfb):
     """
     Print BFB model results.
     """
-    ac, us, tdh, umf, us_umf, zexp, ut_bed, ut_bio, ut_char = results
     w = 12  # width specifier
 
     bfb_string = f"""
     {' BFB Model ':-^40}\n
-    {'ac':<{w}} {ac:<{w}.4f} Inner cross section area [m²]
-    {'us':<{w}} {us:<{w}.4f} Superficial gas velocity [m/s]
-    {'tdh_chan':<{w}} {tdh.chan:<{w}.4f} Transport disengaging Height [m]
-    {'tdh_horio':<{w}} {tdh.horio:<{w}.4f} Transport disengaging Height [m]
+    {'ac':<{w}} {bfb.ac:<{w}.4f} Inner cross section area [m²]
+    {'us':<{w}} {bfb.us:<{w}.4f} Superficial gas velocity [m/s]
+    {'tdh_chan':<{w}} {bfb.tdh_chan:<{w}.4f} Transport disengaging height [m]
+    {'tdh_horio':<{w}} {bfb.tdh_horio:<{w}.4f} Transport disengaging height [m]
 
     Ergun
-    {'umf':<{w}} {umf.ergun:<{w}.4f} Minimum fluidization velocity [m/s]
-    {'us_umf':<{w}} {us_umf.ergun:<{w}.2f} Us/Umf for gas and bed particles [-]
-    {'zexp':<{w}} {zexp.ergun:<{w}.2f} Height of expanded bed [m]
+    {'umf':<{w}} {bfb.umf_ergun:<{w}.4f} Minimum fluidization velocity [m/s]
+    {'us_umf':<{w}} {bfb.us_umf_ergun:<{w}.2f} Us/Umf for gas and bed particles [-]
+    {'zexp':<{w}} {bfb.zexp_ergun:<{w}.2f} Height of expanded bed [m]
 
     Wen and Yu
-    {'umf':<{w}} {umf.wenyu:<{w}.4f} Minimum fluidization velocity [m/s]
-    {'us_umf':<{w}} {us_umf.wenyu:<{w}.2f} Us/Umf for gas and bed particles [-]
-    {'zexp':<{w}} {zexp.wenyu:<{w}.2f} Height of expanded bed [m]
+    {'umf':<{w}} {bfb.umf_wenyu:<{w}.4f} Minimum fluidization velocity [m/s]
+    {'us_umf':<{w}} {bfb.us_umf_wenyu:<{w}.2f} Us/Umf for gas and bed particles [-]
+    {'zexp':<{w}} {bfb.zexp_wenyu:<{w}.2f} Height of expanded bed [m]
 
     Bed material
-    {'ut_ganser':<{w}} {ut_bed.ganser:<{w}.2f} Terminal velocity [m/s]
-    {'ut_haider':<{w}} {ut_bed.haider:<{w}.2f} Terminal velocity [m/s]
+    {'ut_ganser':<{w}} {bfb.ut_bed_ganser:<{w}.2f} Terminal velocity [m/s]
+    {'ut_haider':<{w}} {bfb.ut_bed_haider:<{w}.2f} Terminal velocity [m/s]
 
     Biomass material
-    {'ut_ganser':<{w}} {ut_bio.ganser:<{w}.2f} Terminal velocity [m/s]
-    {'ut_haider':<{w}} {ut_bio.haider:<{w}.2f} Terminal velocity [m/s]
+    {'ut_ganser':<{w}} {bfb.ut_bio_ganser:<{w}.2f} Terminal velocity [m/s]
+    {'ut_haider':<{w}} {bfb.ut_bio_haider:<{w}.2f} Terminal velocity [m/s]
 
     Char material
-    {'ut_ganser':<{w}} {ut_char.ganser:<{w}.2f} Terminal velocity [m/s]
-    {'ut_haider':<{w}} {ut_char.haider:<{w}.2f} Terminal velocity [m/s]"""
+    {'ut_ganser':<{w}} {bfb.ut_char_ganser:<{w}.2f} Terminal velocity [m/s]
+    {'ut_haider':<{w}} {bfb.ut_char_haider:<{w}.2f} Terminal velocity [m/s]"""
     print(textwrap.dedent(bfb_string))
 
 
-def print_particle_results(results):
+def print_particle_results(part):
     """
     Print particle model results.
     """
-    t_hc, tk_hc, t_tkinf = results
     w = 12  # width specifier
 
     particle_string = f"""
     {' Particle Model ':-^40}\n
-    {'t_tkinf':<{w}} {t_tkinf:<{w}.2f} Time for particle center to reach T∞ [s]"""
+    {'t_tkinf':<{w}} {part.t_ref:<{w}.2f} Time for particle center to reach T∞ [s]"""
     print(textwrap.dedent(particle_string))
 
 
-def print_pyrolysis_results(results):
+def print_pyrolysis_results(pyro):
     """
     Print pyrolysis model results.
     """
-    t_devol, = results
     w = 12  # width specifier
 
     res_string = f"""
     {' Pyrolysis Model ':-^40}\n
-    {'t_devol':<{w}} {t_devol:<{w}.2f} Devolatilization time for 95% conversion [s]
+    {'t_devol':<{w}} {pyro.t_devol:<{w}.2f} Devolatilization time for 95% conversion [s]
     """
     print(textwrap.dedent(res_string))

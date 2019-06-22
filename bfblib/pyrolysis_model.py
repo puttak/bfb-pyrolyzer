@@ -4,16 +4,13 @@ import chemics as cm
 class PyrolysisModel:
 
     def __init__(self, gas, params):
-        self._gas = gas
-        self._params = params
+        self.dp_bio = params.biomass['dp_mean'] * 1000
+        self.tk = gas.tk
+        self._calc_devol_time()
 
-    def calc_devol_time(self):
+    def _calc_devol_time(self):
         """
-        Returns
-        -------
-        tv : float
-            Devolatilization time of the biomass particle [s]
+        Calculate devolatilization time [s] of the biomass particle.
         """
-        dp = self._params.biomass['dp_mean'] * 1000
-        tv = cm.devol_time(dp, self._gas.tk)
-        return tv
+        tv = cm.devol_time(self.dp_bio, self.tk)
+        self.t_devol = tv
