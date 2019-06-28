@@ -89,8 +89,7 @@ class BfbModel:
         """
         umf_ergun = cm.umf_ergun(self._dpbed, self._ep, self._mu, self._phibed, self._rhog, self._rhosbed)
         umf_wenyu = cm.umf_coeff(self._dpbed, self._mu, self._rhog, self._rhosbed, coeff='wenyu')
-        self.umf_ergun = umf_ergun
-        self.umf_wenyu = umf_wenyu
+        self.umf = {'ergun': umf_ergun, 'wenyu': umf_wenyu}
 
     def _calc_us_umf(self):
         """
@@ -98,8 +97,7 @@ class BfbModel:
         """
         us_umf_ergun = self.us / self.umf_ergun
         us_umf_wenyu = self.us / self.umf_wenyu
-        self.us_umf_ergun = us_umf_ergun
-        self.us_umf_wenyu = us_umf_wenyu
+        self.us_umf = {'ergun': us_umf_ergun, 'wenyu': us_umf_wenyu}
 
     def _calc_ut(self):
         """
@@ -107,18 +105,15 @@ class BfbModel:
         """
         _, _, ut_bed_ganser = cm.ut_ganser(self._dpbed, self._mu, self._phibed, self._rhog, self._rhosbed)
         ut_bed_haider = cm.ut_haider(self._dpbed, self._mu, self._phibed, self._rhog, self._rhosbed)
-        self.ut_bed_ganser = ut_bed_ganser
-        self.ut_bed_haider = ut_bed_haider
+        self.ut_bed = {'ganser': ut_bed_ganser, 'haider': ut_bed_haider}
 
         _, _, ut_bio_ganser = cm.ut_ganser(self._dpbio, self._mu, self._phibio, self._rhog, self._rhosbio)
         ut_bio_haider = cm.ut_haider(self._dpbio, self._mu, self._phibio, self._rhog, self._rhosbio)
-        self.ut_bio_ganser = ut_bio_ganser
-        self.ut_bio_haider = ut_bio_haider
+        self.ut_bio = {'ganser': ut_bio_ganser, 'haider': ut_bio_haider}
 
         _, _, ut_char_ganser = cm.ut_ganser(self._dpbio, self._mu, self._phibio, self._rhog, self._rhoschar)
         ut_char_haider = cm.ut_haider(self._dpbio, self._mu, self._phibio, self._rhog, self._rhoschar)
-        self.ut_char_ganser = ut_char_ganser
-        self.ut_char_haider = ut_char_haider
+        self.ut_char = {'ganser': ut_char_ganser, 'haider': ut_char_haider}
 
     def _calc_tdh(self):
         """

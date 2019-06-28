@@ -1,6 +1,8 @@
 import numpy as np
 
 from .gas import Gas
+from .particle import Particle
+
 from .bfb_model import BfbModel
 from .particle_model import ParticleModel
 from .pyrolysis_model import PyrolysisModel
@@ -30,7 +32,22 @@ class Simulation:
         # Note that gas mixture uses the Herning calculation for viscosity
         gas = Gas(self._params)
 
-        # BFB model for fluidization
+        # Bed, biomass, and char particles
+        dp = self._params.bed['dp'][0]
+        ep = self._params.bed['ep']
+        phi = self._params.bed['phi']
+        rhos = self._params.bed['rhos']
+        bed = Particle(dp, ep, gas, phi, rhos)
+
+        dp = self._params.biomass['dp_mean']
+        phi = self._params.biomass['phi']
+        rhos = self._params.biomass['sg'] * 1000
+        bio = Particle(dp, ep, gas, phi, rhos)
+
+        rhos = self._params.bed['rhos_char']
+        char = Particle(dp, ep, gas, phi, rhos)
+
+        # BFB reactor model
         bfb = BfbModel(gas, self._params)
 
         # Particle model for biomass intra-particle heat conduction
