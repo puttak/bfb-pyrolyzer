@@ -1,3 +1,4 @@
 # flake8: noqa
 
-from .simulation import Simulation
+from .simulation import run_params
+from .simulation import run_temps

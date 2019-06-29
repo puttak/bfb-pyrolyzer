@@ -10,34 +10,43 @@ def print_parameters(params):
     w = 12  # width specifier
 
     pm_string = f"""
-    {' Bed ':-^40}\n
-    {'dp_mean':<{w}} {params.bed['dp'][0]:<{w}} Mean particle diameter [m]
-    {'dp_min':<{w}} {params.bed['dp'][1]:<{w}} Minimum particle diameter [m]
-    {'dp_max':<{w}} {params.bed['dp'][2]:<{w}} Maximum particle diameter [m]
-    {'ep':<{w}} {params.bed['ep']:<{w}} Void fraction of bed [-]
-    {'phi':<{w}} {params.bed['phi']:<{w}} Particle sphericity [-]
-    {'rhos':<{w}} {params.bed['rhos']:<{w}} Density of a bed particle [kg/m³]
-    {'zmf':<{w}} {params.bed['zmf']:<{w}} Bed height at minimum fluidization [m]
+    {' Bed Particle ':-^40}\n
+    {'dp':<{w}} {params.bed['dp']:<{w}} Mean particle diameter [m]
+    {'dp_min':<{w}} {params.bed['dp_min']:<{w}} Minimum particle diameter [m]
+    {'dp_max':<{w}} {params.bed['dp_max']:<{w}} Maximum particle diameter [m]
+    {'phi':<{w}} {params.bed['phi']:<{w}} Sphericity [-]
+    {'rho':<{w}} {params.bed['rho']:<{w}} Density [kg/m³]
 
-    {' Biomass ':-^40}\n
-    {'dp_mean':<{w}} {params.biomass['dp_mean']:<{w}} Mean particle diameter [m]
-    {'h':<{w}} {params.biomass['h']:<{w}} Heat transfer coefficient for convection [W/m²K]
-    {'k':<{w}} {params.biomass['k']:<{w}} Thermal conductivity of loblolly pine [W/mK]
-    {'mc':<{w}} {params.biomass['mc']:<{w}} Moisture content [%]
+    {' Biomass Particle ':-^40}\n
+    {'dp':<{w}} {params.biomass['dp']:<{w}} Mean particle diameter [m]
     {'phi':<{w}} {params.biomass['phi']:<{w}} Particle sphericity [-]
     {'sg':<{w}} {params.biomass['sg']:<{w}} Specific gravity of loblolly pine [-]
-    {'tk_i':<{w}} {params.biomass['tk_i']:<{w}} Initial particle temperature [K]
+    {'b':<{w}} {params.biomass['b']:<{w}} Shape factor for particle transient heat conduction[-]
+    {'h':<{w}} {params.biomass['h']:<{w}} Heat transfer coefficient for convection [W/m²K]
+    {'k':<{w}} {params.biomass['k']:<{w}} Thermal conductivity of loblolly pine [W/mK]
+    {'m':<{w}} {params.biomass['m']:<{w}} Number of nodes from particle center (m=0) to surface (m)
+    {'mc':<{w}} {params.biomass['mc']:<{w}} Moisture content [%]
+    {'nt':<{w}} {params.biomass['nt']:<{w}} Number of time steps for particle temperature profile [-]
+    {'tki':<{w}} {params.biomass['tki']:<{w}} Initial particle temperature [K]
+    {'t_max':<{w}} {params.biomass['t_max']:<{w}} Time duration to calculate particle temperature profile [s]
 
-    {' Gas ':-^40}\n
-    {'p':<{w}} {params.gas['p']:<{w},} Gas pressure in reactor [Pa]
-    {'sp':<{w}} {sp:<{w}} Comionents of gas mixture [-]
-    {'tk':<{w}} {params.gas['tk']:<{w}} Gas temperature in reactor [K]
+    {' Char Particle ':-^40}\n
+    {'dp':<{w}} {params.char['dp']:<{w}} Mean particle diameter [m]
+    {'phi':<{w}} {params.char['phi']:<{w}} Sphericity [-]
+    {'rho':<{w}} {params.char['rho']:<{w}} Density [kg/m³]
+
+    {' Gas Properties ':-^40}\n
+    {'sp':<{w}} {sp:<{w}} Components of gas mixture [-]
     {'x':<{w}} {x:<{w}} Mole fractions of components in gas mixture [-]
+    {'p':<{w}} {params.gas['p']:<{w},} Gas pressure in reactor [Pa]
+    {'tk':<{w}} {params.gas['tk']:<{w}} Gas temperature in reactor [K]
 
-    {' Reactor ':-^40}\n
+    {' Reactor Geometry and Conditions ':-^40}\n
     {'di':<{w}} {params.reactor['di']:<{w}} Inner diameter of reactor [m]
+    {'ep':<{w}} {params.reactor['ep']:<{w}} Void fraction of bed [-]
     {'ht':<{w}} {params.reactor['ht']:<{w}} Total height of reactor [m]
     {'q':<{w}} {params.reactor['q']:<{w}} Volumetric flowrate of gas into reactor [SLM]
+    {'zmf':<{w}} {params.reactor['zmf']:<{w}} Bed height at minimum fluidization [m]
     """
     print(textwrap.dedent(pm_string))
 
@@ -56,6 +65,35 @@ def print_gas_properties(gas):
     print(textwrap.dedent(gas_string))
 
 
+def print_particle_results(bed, bio, char):
+    """
+    Print bed particle results from Particle class object.
+    """
+    w = 12  # width specifier
+
+    particle_string = f"""
+    {' Bed Particle ':-^40}\n
+    {'umf_ergun':<{w}} {bed.umf_ergun:<{w}.4f} Minimum fluidization velocity [m/s]
+    {'umf_wenyu':<{w}} {bed.umf_wenyu:<{w}.4f} Minimum fluidization velocity [m/s]
+    {'ut_ganser':<{w}} {bed.ut_ganser:<{w}.2f} Terminal velocity [m/s]
+    {'ut_haider':<{w}} {bed.ut_haider:<{w}.2f} Terminal velocity [m/s]
+
+    {' Biomass Particle ':-^40}\n
+    {'t_devol':<{w}} {bio.t_devol:<{w}.2f} Devolatilization time for 95% conversion [s]
+    {'t_ref':<{w}} {bio.t_ref:<{w}.2f} Time for particle center to reach T∞ [s]
+    {'umf_ergun':<{w}} {bio.umf_ergun:<{w}.4f} Minimum fluidization velocity [m/s]
+    {'umf_wenyu':<{w}} {bio.umf_wenyu:<{w}.4f} Minimum fluidization velocity [m/s]
+    {'ut_ganser':<{w}} {bio.ut_ganser:<{w}.2f} Terminal velocity [m/s]
+    {'ut_haider':<{w}} {bio.ut_haider:<{w}.2f} Terminal velocity [m/s]
+
+    {' Char Particle ':-^40}\n
+    {'umf_ergun':<{w}} {char.umf_ergun:<{w}.4f} Minimum fluidization velocity [m/s]
+    {'umf_wenyu':<{w}} {char.umf_wenyu:<{w}.4f} Minimum fluidization velocity [m/s]
+    {'ut_ganser':<{w}} {char.ut_ganser:<{w}.2f} Terminal velocity [m/s]
+    {'ut_haider':<{w}} {char.ut_haider:<{w}.2f} Terminal velocity [m/s]"""
+    print(textwrap.dedent(particle_string))
+
+
 def print_bfb_results(bfb):
     """
     Print BFB model results.
@@ -68,51 +106,8 @@ def print_bfb_results(bfb):
     {'us':<{w}} {bfb.us:<{w}.4f} Superficial gas velocity [m/s]
     {'tdh_chan':<{w}} {bfb.tdh_chan:<{w}.4f} Transport disengaging height [m]
     {'tdh_horio':<{w}} {bfb.tdh_horio:<{w}.4f} Transport disengaging height [m]
-
-    Ergun
-    {'umf':<{w}} {bfb.umf_ergun:<{w}.4f} Minimum fluidization velocity [m/s]
-    {'us_umf':<{w}} {bfb.us_umf_ergun:<{w}.2f} Us/Umf for gas and bed particles [-]
-    {'zexp':<{w}} {bfb.zexp_ergun:<{w}.2f} Height of expanded bed [m]
-
-    Wen and Yu
-    {'umf':<{w}} {bfb.umf_wenyu:<{w}.4f} Minimum fluidization velocity [m/s]
-    {'us_umf':<{w}} {bfb.us_umf_wenyu:<{w}.2f} Us/Umf for gas and bed particles [-]
-    {'zexp':<{w}} {bfb.zexp_wenyu:<{w}.2f} Height of expanded bed [m]
-
-    Bed material
-    {'ut_ganser':<{w}} {bfb.ut_bed_ganser:<{w}.2f} Terminal velocity [m/s]
-    {'ut_haider':<{w}} {bfb.ut_bed_haider:<{w}.2f} Terminal velocity [m/s]
-
-    Biomass material
-    {'ut_ganser':<{w}} {bfb.ut_bio_ganser:<{w}.2f} Terminal velocity [m/s]
-    {'ut_haider':<{w}} {bfb.ut_bio_haider:<{w}.2f} Terminal velocity [m/s]
-
-    Char material
-    {'ut_ganser':<{w}} {bfb.ut_char_ganser:<{w}.2f} Terminal velocity [m/s]
-    {'ut_haider':<{w}} {bfb.ut_char_haider:<{w}.2f} Terminal velocity [m/s]"""
+    {'us_umf_ergun':<{w}} {bfb.us_umf_ergun:<{w}.2f} Us/Umf for gas and bed particles [-]
+    {'us_umf_wenyu':<{w}} {bfb.us_umf_wenyu:<{w}.2f} Us/Umf for gas and bed particles [-]
+    {'zexp_ergun':<{w}} {bfb.zexp_ergun:<{w}.2f} Height of expanded bed [m]
+    {'zexp_wenyu':<{w}} {bfb.zexp_wenyu:<{w}.2f} Height of expanded bed [m]"""
     print(textwrap.dedent(bfb_string))
-
-
-def print_particle_results(part):
-    """
-    Print particle model results.
-    """
-    w = 12  # width specifier
-
-    particle_string = f"""
-    {' Particle Model ':-^40}\n
-    {'t_tkinf':<{w}} {part.t_ref:<{w}.2f} Time for particle center to reach T∞ [s]"""
-    print(textwrap.dedent(particle_string))
-
-
-def print_pyrolysis_results(pyro):
-    """
-    Print pyrolysis model results.
-    """
-    w = 12  # width specifier
-
-    res_string = f"""
-    {' Pyrolysis Model ':-^40}\n
-    {'t_devol':<{w}} {pyro.t_devol:<{w}.2f} Devolatilization time for 95% conversion [s]
-    """
-    print(textwrap.dedent(res_string))

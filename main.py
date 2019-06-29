@@ -6,7 +6,8 @@ import argparse
 import importlib
 import pathlib
 
-from bfblib import Simulation
+from bfblib import run_params
+from bfblib import run_temps
 
 
 def main(args):
@@ -21,18 +22,15 @@ def main(args):
 
     # Run simulation for parameters only
     if args.params:
-        sim = Simulation(params)
-        sim.run_params()
+        run_params(params)
 
     # Run simulation for parameters only and save figures to path
     if args.params and args.figs:
-        sim = Simulation(params, path)
-        sim.run_params()
+        run_params(params, path)
 
     # Run a simulation for temperatures case and save figures to path
     if args.temps:
-        sim = Simulation(params, path)
-        sim.run_temps()
+        run_temps(params, path)
 
     # Cleanup project directory
     if args.clean:

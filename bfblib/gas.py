@@ -23,13 +23,13 @@ class Gas:
         Density [kg/m³]
     """
 
-    def __init__(self, params, eq='herning'):
-        self.p = params.gas['p']
-        self.sp = params.gas['sp']
-        self.tk = params.gas['tk']
-        self.x = params.gas['x']
+    def __init__(self, sp, x, p, tk, eq='herning'):
+        self.sp = sp
+        self.x = x
+        self.p = p
+        self.tk = tk
         self._eq = eq
-        self._n = len(params.gas['sp'])
+        self._n = len(sp)
         self._calc_mw()
         self._calc_rho()
         self._calc_mu()

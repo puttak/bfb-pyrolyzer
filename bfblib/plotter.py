@@ -17,23 +17,23 @@ def plot_geldart(gas, params, path):
     """
     # Conversion for m = µm * 1e6
     # Conversion for g/cm³ = kg/m³ * 0.001
-    dp = params.bed['dp'][0] * 1e6
-    dpmin = params.bed['dp'][1] * 1e6
-    dpmax = params.bed['dp'][2] * 1e6
+    dp = params.bed['dp'] * 1e6
+    dpmin = params.bed['dp_min'] * 1e6
+    dpmax = params.bed['dp_max'] * 1e6
     rhog = gas.rho * 0.001
-    rhos = params.bed['rhos'] * 0.001
+    rhos = params.bed['rho'] * 0.001
     fig = cm.geldart_chart(dp, rhog, rhos, dpmin, dpmax)
     fig.savefig(f'{path}/fig_geldart.pdf')
 
 
-def plot_intra_particle_heat_cond(part, path):
+def plot_intra_particle_heat_cond(bio, path):
     """
     here
     """
     fig, ax = plt.subplots(tight_layout=True)
-    ax.plot(part.t_vec, part.tk_array[:, 0], lw=2, label='center')
-    ax.plot(part.t_vec, part.tk_array[:, -1], lw=2, label='surface')
-    ax.axvline(part.t_ref, c='k', ls='--', label='Tinf')
+    ax.plot(bio.t, bio.tk[:, 0], lw=2, label='center')
+    ax.plot(bio.t, bio.tk[:, -1], lw=2, label='surface')
+    ax.axvline(bio.t_ref, c='k', ls='--', label='Tinf')
     _config(ax, 'Time [s]', 'Temperature [K]')
     fig.savefig(f'{path}/fig_intra_hc.pdf')
 
