@@ -26,20 +26,20 @@ bed = {
 # Biomass Conditions and Properties
 # ----------------------------------------------------------------------------
 
-# Specific gravity and thermal conductivity from Wood Handbook Table 4-7
+# Specific gravity (density) and thermal conductivity from Wood Handbook Table 4-7
 
 biomass = {
     'dp': 0.0005,           # Mean particle diameter [m]
     'phi': 0.6,             # Sphericity of biomass particle [-]
-    'sg': 0.54,             # Specific gravity of loblolly pine [-]
+    'rho': 540,             # Density of loblolly pine [kg/m³]
     'b': 2,                 # Shape factor for particle transient heat conduction [-]
     'h': 350,               # Heat transfer coefficient for convection [W/m²K]
     'k': 0.12,              # Thermal conductivity of loblolly pine [W/mK]
     'm': 1000,              # Number of nodes from particle center (m=0) to surface (m)
     'mc': 0.0,              # Moisture content [%]
     'nt': 1000,             # Number of time steps for particle temperature profile [-]
-    'tki': 293.15,          # Initial particle temperature [K]
-    't_max': 6              # Time duration to calculate particle temperature profile [s]
+    't_max': 6,             # Time duration to calculate particle temperature profile [s]
+    'tk_init': 293.15       # Initial particle temperature [K]
 }
 
 # Char particle

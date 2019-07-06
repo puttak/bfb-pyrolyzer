@@ -5,9 +5,7 @@ Main driver for BFB model simulation of a biomass pyrolysis reactor.
 import argparse
 import importlib
 import pathlib
-
-from bfblib import run_params
-from bfblib import run_temps
+from bfblib import driver
 
 
 def main(args):
@@ -22,15 +20,15 @@ def main(args):
 
     # Run simulation for parameters only
     if args.params:
-        run_params(params)
+        driver.run_params(params)
 
     # Run simulation for parameters only and save figures to path
     if args.params and args.figs:
-        run_params(params, path)
+        driver.run_params(params, path)
 
     # Run a simulation for temperatures case and save figures to path
     if args.temps:
-        run_temps(params, path)
+        driver.run_temps(params, path)
 
     # Cleanup project directory
     if args.clean:

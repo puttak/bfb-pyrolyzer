@@ -20,14 +20,14 @@ def print_parameters(params):
     {' Biomass Particle ':-^40}\n
     {'dp':<{w}} {params.biomass['dp']:<{w}} Mean particle diameter [m]
     {'phi':<{w}} {params.biomass['phi']:<{w}} Particle sphericity [-]
-    {'sg':<{w}} {params.biomass['sg']:<{w}} Specific gravity of loblolly pine [-]
+    {'rho':<{w}} {params.biomass['rho']:<{w}} Density of loblolly pine [kg/m³]
     {'b':<{w}} {params.biomass['b']:<{w}} Shape factor for particle transient heat conduction[-]
     {'h':<{w}} {params.biomass['h']:<{w}} Heat transfer coefficient for convection [W/m²K]
     {'k':<{w}} {params.biomass['k']:<{w}} Thermal conductivity of loblolly pine [W/mK]
     {'m':<{w}} {params.biomass['m']:<{w}} Number of nodes from particle center (m=0) to surface (m)
     {'mc':<{w}} {params.biomass['mc']:<{w}} Moisture content [%]
     {'nt':<{w}} {params.biomass['nt']:<{w}} Number of time steps for particle temperature profile [-]
-    {'tki':<{w}} {params.biomass['tki']:<{w}} Initial particle temperature [K]
+    {'tki':<{w}} {params.biomass['tk_init']:<{w}} Initial particle temperature [K]
     {'t_max':<{w}} {params.biomass['t_max']:<{w}} Time duration to calculate particle temperature profile [s]
 
     {' Char Particle ':-^40}\n

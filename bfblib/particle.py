@@ -38,6 +38,16 @@ class Particle:
         self.phi = phi
         self.rho = rho
 
+    @classmethod
+    def from_params(cls, params):
+        """
+        Create class from parameters dictionary.
+        """
+        dp = params['dp']
+        phi = params['phi']
+        rho = params['rho']
+        return cls(dp, phi, rho)
+
     def calc_umf(self, ep, mug, rhog):
         """
         Calculate minimum fluidization velocity [m/s] of the particle.
