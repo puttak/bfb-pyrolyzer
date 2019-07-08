@@ -18,13 +18,11 @@ def main(args):
     infile = args.infile.replace('/', '.')[:-3]
     params = importlib.import_module(infile)
 
-    # Run simulation for parameters only
-    if args.params:
-        driver.run_params(params)
-
-    # Run simulation for parameters only and save figures to path
+    # Run simulation for parameters and save figures if path defined
     if args.params and args.figs:
         driver.run_params(params, path)
+    elif args.params:
+        driver.run_params(params)
 
     # Run a simulation for temperatures case and save figures to path
     if args.temps:
