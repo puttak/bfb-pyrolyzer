@@ -1,7 +1,6 @@
+import chemics as cm
 import numpy as np
 import scipy.linalg as sp
-
-from .heat_capacity import heatcap
 
 
 def hc2(d, x, k, Gb, h, Ti, Tinf, b, m, t):
@@ -50,7 +49,7 @@ def hc2(d, x, k, Gb, h, Ti, Tinf, b, m, t):
 
     # vectors = cp, alpha, Fo whereas single values = rho, k, Bi
     rho = Gb * 1000
-    cp = heatcap(x, T[0]) * 1000
+    cp = cm.cp_wood(x, T[0]) * 1000
     alpha = k / (rho * cp)
     Fo = alpha * dt / (dr**2)
     Bi = h * dr / k
@@ -96,7 +95,7 @@ def hc2(d, x, k, Gb, h, Ti, Tinf, b, m, t):
         T[i] = sp.solve_banded((1, 1), ab, bb)
 
         # update heat capacity, alpha, and Fourier number
-        cp = heatcap(x, T[i]) * 1000
+        cp = cm.cp_wood(x, T[i]) * 1000
         alpha = k / (rho * cp)
         Fo = alpha * dt / (dr**2)
 
