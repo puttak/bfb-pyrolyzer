@@ -33,17 +33,10 @@ class BfbModel:
     """
 
     def __init__(self, di, q, zmf):
+        self.ac = (np.pi * di**2) / 4
         self.di = di
         self.q = q
         self.zmf = zmf
-        self._calc_ac()
-
-    def _calc_ac(self):
-        """
-        Calculate inner cross section area [m²] of the reactor.
-        """
-        area = (np.pi * self.di**2) / 4
-        self.ac = area
 
     def calc_us(self, gas):
         """

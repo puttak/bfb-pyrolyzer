@@ -4,10 +4,8 @@ from .gas import Gas
 from .particle import Particle
 from .bfb_model import BfbModel
 
-from .printer import print_parameters
-from .printer import print_gas_properties
-from .printer import print_particle_results
-from .printer import print_bfb_results
+from .printer import print_params
+from .printer import print_params_results
 
 from .plotter import plot_geldart
 from .plotter import plot_intra_particle_heat_cond
@@ -48,15 +46,9 @@ def run_params(pm, path=None):
     bfb.calc_tdh()
     bfb.calc_zexp(bed, gas)
 
-    # Print parameters to screen
-    print(f"\n{' Parameters ':*^40}")
-    print_parameters(pm)
-
-    # Print results to screen
-    print(f"{' Results from Parameters ':*^40}")
-    print_gas_properties(gas)
-    print_particle_results(bed, bio, char)
-    print_bfb_results(bfb)
+    # Print parameters and results to screen
+    print_params(pm)
+    print_params_results(bed, bfb, bio, char, gas)
 
     # Create and save plot figures if path is defined
     if path is not None:

@@ -26,7 +26,7 @@ bed = {
     'rho': 2600             # Density [kg/m³]
 }
 
-# Biomass Conditions and Properties
+# Biomass Particle
 # ----------------------------------------------------------------------------
 
 # Specific gravity (density) and thermal conductivity from Wood Handbook Table 4-7
@@ -54,7 +54,7 @@ char = {
     'rho': 120          # Density [kg/m³]
 }
 
-# Gas Conditions
+# Gas Properties
 # ----------------------------------------------------------------------------
 
 gas = {
