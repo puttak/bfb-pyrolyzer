@@ -1,5 +1,6 @@
 import chemics as cm
 import numpy as np
+from .helpers import Tdh, UsUmf, Zexp
 
 
 class BfbModel:
@@ -14,20 +15,14 @@ class BfbModel:
         Inner diameter of the reactor [m]
     q : float
         Volumetric flowrate of gas into reactor [SLM]
-    tdh_chan : float
-        Transport disengaging height from Chan equation [m]
-    tdh_horio : float
-        Transport disengaging height from Horio equation [m]
+    tdh : namedtuple
+        Transport disengaging height [m]. Values available for `chan` and `horio`.
     us : float
         Superficial gas velocity [m/s]
-    us_umf_ergun : float
-        Ratio of Us/Umf based on Ergun equation [-]
-    us_umf_wenyu : float
-        Ratio of Us/Umf based on Wen and Yu equation [-]
-    zexp_ergun : float
-        Expanded bed height based on Ergun equation [m]
-    zexp_wenyu : float
-        Expanded bed height based on Wen and Yu equation [m]
+    us_umf : namedtuple
+        Ratio of Us/Umf [-]. Values available for `ergun` and `wenyu`.
+    zexp : namedtuple
+        Expanded bed height [m]. Values available for `ergun` and `wenyu`.
     zmf : float
         Bed height at minimum fluidization [m]
     """
@@ -52,8 +47,9 @@ class BfbModel:
         """
         Calculate ratio of Us/Umf.
         """
-        self.us_umf_ergun = self.us / bed.umf_ergun
-        self.us_umf_wenyu = self.us / bed.umf_wenyu
+        us_umf_ergun = self.us / bed.umf.ergun
+        us_umf_wenyu = self.us / bed.umf.wenyu
+        self.us_umf = UsUmf(us_umf_ergun, us_umf_wenyu)
 
     def calc_tdh(self):
         """
@@ -61,16 +57,14 @@ class BfbModel:
         """
         tdh_chan = 0.85 * (self.us**1.2) * (7.33 - 1.2 * np.log(self.us))
         tdh_horio = ((2.7 * self.di ** -0.36) - 0.7) * self.di * np.exp(0.74 * self.us * self.di ** -0.23)
-        self.tdh_chan = tdh_chan
-        self.tdh_horio = tdh_horio
+        self.tdh = Tdh(tdh_chan, tdh_horio)
 
     def calc_zexp(self, bed, gas):
         """
         Calculate expanded bed height [m] from the bed expansion factor.
         """
-        fbexp_ergun = cm.fbexp(self.di, bed.dp, gas.rho, bed.rho, bed.umf_ergun, self.us)
+        fbexp_ergun = cm.fbexp(self.di, bed.dp, gas.rho, bed.rho, bed.umf.ergun, self.us)
         zexp_ergun = self.zmf * fbexp_ergun
-        fbexp_wenyu = cm.fbexp(self.di, bed.dp, gas.rho, bed.rho, bed.umf_wenyu, self.us)
+        fbexp_wenyu = cm.fbexp(self.di, bed.dp, gas.rho, bed.rho, bed.umf.wenyu, self.us)
         zexp_wenyu = self.zmf * fbexp_wenyu
-        self.zexp_ergun = zexp_ergun
-        self.zexp_wenyu = zexp_wenyu
+        self.zexp = Zexp(zexp_ergun, zexp_wenyu)

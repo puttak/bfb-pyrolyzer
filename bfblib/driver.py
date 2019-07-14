@@ -106,14 +106,14 @@ def run_temps(pm, path):
         char.calc_ut(gas.mu, gas.rho)
 
         # Append results for each temperature
-        umf_ergun.append(bed.umf_ergun)
-        umf_wenyu.append(bed.umf_wenyu)
-        ut_bed_ganser.append(bed.ut_ganser)
-        ut_bed_haider.append(bed.ut_haider)
-        ut_bio_ganser.append(bio.ut_ganser)
-        ut_bio_haider.append(bio.ut_haider)
-        ut_char_ganser.append(char.ut_ganser)
-        ut_char_haider.append(char.ut_haider)
+        umf_ergun.append(bed.umf.ergun)
+        umf_wenyu.append(bed.umf.wenyu)
+        ut_bed_ganser.append(bed.ut.ganser)
+        ut_bed_haider.append(bed.ut.haider)
+        ut_bio_ganser.append(bio.ut.ganser)
+        ut_bio_haider.append(bio.ut.haider)
+        ut_char_ganser.append(char.ut.ganser)
+        ut_char_haider.append(char.ut.haider)
         ts_devol.append(bio.t_devol)
 
     uts_ganser = {'bed': ut_bed_ganser, 'bio': ut_bio_ganser, 'char': ut_char_ganser}

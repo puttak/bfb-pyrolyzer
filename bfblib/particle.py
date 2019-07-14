@@ -1,5 +1,6 @@
 import chemics as cm
 import numpy as np
+from .helpers import Umf, Ut
 from .trans_heat_cond import hc2
 
 
@@ -23,14 +24,10 @@ class Particle:
         Time when particle is near reactor temperature [s]
     tk : array
         Intra-particle temperature [K]
-    umf_ergun : float
-        Minimum fluidization velocity from Ergun equation [m/s]
-    umf_wenyu : float
-        Minimum fluidization velocity from Wen and Yu equation [m/s]
-    ut_ganser : float
-        Terminal velocity from Ganser equation [m/s]
-    ut_haider : float
-        Terminal velocity from Haider equation [m/s]
+    umf : namedtuple
+        Minimum fluidization velocity [m/s]. Values available for `ergun` and `wenyu`.
+    ut : namedtuple
+        Terminal velocity [m/s]. Values available for `ganser` and `haider`.
     """
 
     def __init__(self, dp, phi, rho):
@@ -55,8 +52,7 @@ class Particle:
         mug = mug * 1e-7  # convert to kg/ms = µP * 1e-7
         umf_ergun = cm.umf_ergun(self.dp, ep, mug, self.phi, rhog, self.rho)
         umf_wenyu = cm.umf_coeff(self.dp, mug, rhog, self.rho, coeff='wenyu')
-        self.umf_ergun = umf_ergun
-        self.umf_wenyu = umf_wenyu
+        self.umf = Umf(umf_ergun, umf_wenyu)
 
     def calc_ut(self, mug, rhog):
         """
@@ -65,8 +61,7 @@ class Particle:
         mug = mug * 1e-7  # convert to kg/ms = µP * 1e-7
         _, _, ut_ganser = cm.ut_ganser(self.dp, mug, self.phi, rhog, self.rho)
         ut_haider = cm.ut_haider(self.dp, mug, self.phi, rhog, self.rho)
-        self.ut_ganser = ut_ganser
-        self.ut_haider = ut_haider
+        self.ut = Ut(ut_ganser, ut_haider)
 
     def build_time_vector(self, nt, t_max):
         """
