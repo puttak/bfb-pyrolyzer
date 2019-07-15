@@ -59,24 +59,15 @@ def run_params(pm, path=None):
 def run_temps(pm, path):
     print(f"\n{' Simulate Temperatures ':*^40}\n")
 
-    tk_ref = pm.gas['tk']
     tk_min = pm.case['tk'][0]
     tk_max = pm.case['tk'][1]
     tks = np.arange(tk_min, tk_max + 10, 10)
 
-    # Store Umf at each temperature from Ergun and WenYu equations
-    umf_ergun = []
-    umf_wenyu = []
-
-    # Store Ut at each temperature from Ganser and Haider equations
-    ut_bed_ganser = []
-    ut_bed_haider = []
-    ut_bio_ganser = []
-    ut_bio_haider = []
-    ut_char_ganser = []
-    ut_char_haider = []
-
-    # Store devolatilization time for each temperature
+    # Store Umf, Ut, and devolatilization time at each temperature
+    umf = []
+    ut_bed = []
+    ut_bio = []
+    ut_char = []
     ts_devol = []
 
     # Bed, biomass, and char particle
@@ -106,21 +97,15 @@ def run_temps(pm, path):
         char.calc_ut(gas.mu, gas.rho)
 
         # Append results for each temperature
-        umf_ergun.append(bed.umf.ergun)
-        umf_wenyu.append(bed.umf.wenyu)
-        ut_bed_ganser.append(bed.ut.ganser)
-        ut_bed_haider.append(bed.ut.haider)
-        ut_bio_ganser.append(bio.ut.ganser)
-        ut_bio_haider.append(bio.ut.haider)
-        ut_char_ganser.append(char.ut.ganser)
-        ut_char_haider.append(char.ut.haider)
+        umf.append(bed.umf)
+        ut_bed.append(bed.ut)
+        ut_bio.append(bio.ut)
+        ut_char.append(char.ut)
         ts_devol.append(bio.t_devol)
 
-    uts_ganser = {'bed': ut_bed_ganser, 'bio': ut_bio_ganser, 'char': ut_char_ganser}
-    uts_haider = {'bed': ut_bed_haider, 'bio': ut_bio_haider, 'char': ut_char_haider}
-
-    plot_umf_temps(tks, umf_ergun, umf_wenyu, tk_ref, path)
-    plot_ut_temps(tks, uts_ganser, uts_haider, path)
+    tk_ref = pm.gas['tk']
+    plot_umf_temps(tks, umf, tk_ref, path)
+    plot_ut_temps(tks, ut_bed, ut_bio, ut_char, path)
     plot_tdevol_temps(tks, ts_devol, tk_ref, path)
 
     print(f'Matplotlib figures saved to the `{path.name}` folder.\n')

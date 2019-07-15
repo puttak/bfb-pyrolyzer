@@ -38,47 +38,47 @@ def plot_intra_particle_heat_cond(bio, path):
     fig.savefig(f'{path}/fig_intra_hc.pdf')
 
 
-def plot_umf_temps(tks, umfs_ergun, umfs_wenyu, tk_ref, path):
+def plot_umf_temps(tks, umf, tk_ref, path):
     """
     here
     """
-    ymax = max(umfs_ergun + umfs_wenyu) * 1.2
-    ymin = min(umfs_ergun + umfs_wenyu) * 0.8
+    umf_ergun = [x.ergun for x in umf]
+    umf_wenyu = [x.wenyu for x in umf]
+    ymax = max(umf_ergun + umf_wenyu) * 1.2
+    ymin = min(umf_ergun + umf_wenyu) * 0.8
 
     fig, ax = plt.subplots(tight_layout=True)
-    ax.plot(tks, umfs_ergun, '.-', label='Ergun')
-    ax.plot(tks, umfs_wenyu, '.-', label="WenYu")
+    ax.plot(tks, umf_ergun, '.-', label='Ergun')
+    ax.plot(tks, umf_wenyu, '.-', label="WenYu")
     ax.axvline(tk_ref, color='k', ls='--', label='ref')
-    ax.fill_between(tks, umfs_ergun, umfs_wenyu, alpha=0.6, facecolor='0.9')
+    ax.fill_between(tks, umf_ergun, umf_wenyu, alpha=0.6, facecolor='0.9')
     ax.set_ylim(ymin, ymax)
-    _config(ax, 'Temperature [K]', 'Min. fluidization velocity [m/s]')
+    _config(ax, 'Temperature [K]', 'Min. fluidization velocity, Umf [m/s]')
     fig.savefig(f'{path}/fig_umf_temps.pdf')
 
 
-def plot_ut_temps(tks, uts_ganser, uts_haider, path):
+def plot_ut_temps(tks, ut_bed, ut_bio, ut_char, path):
     """
     here
     """
-    uts_bed_ganser = uts_ganser['bed']
-    uts_bed_haider = uts_haider['bed']
-
-    uts_bio_ganser = uts_ganser['bio']
-    uts_bio_haider = uts_haider['bio']
-
-    uts_char_ganser = uts_ganser['char']
-    uts_char_haider = uts_haider['char']
+    ut_bed_ganser = [x.ganser for x in ut_bed]
+    ut_bed_haider = [x.haider for x in ut_bed]
+    ut_bio_ganser = [x.ganser for x in ut_bio]
+    ut_bio_haider = [x.haider for x in ut_bio]
+    ut_char_ganser = [x.ganser for x in ut_char]
+    ut_char_haider = [x.haider for x in ut_char]
 
     fig, ax = plt.subplots(tight_layout=True)
-    ax.plot(tks, uts_bed_ganser, 'k--', label='Ganser')
-    ax.plot(tks, uts_bed_haider, 'k-', label='Haider')
-    ax.fill_between(tks, uts_bed_ganser, uts_bed_haider, alpha=0.6, facecolor='khaki', label='bed')
-    ax.plot(tks, uts_bio_ganser, 'k--')
-    ax.plot(tks, uts_bio_haider, 'k-')
-    ax.fill_between(tks, uts_bio_ganser, uts_bio_haider, alpha=0.6, facecolor='lightgreen', label='bio')
-    ax.plot(tks, uts_char_ganser, 'k--')
-    ax.plot(tks, uts_char_haider, 'k-')
-    ax.fill_between(tks, uts_char_ganser, uts_char_haider, alpha=0.6, facecolor='grey', label='char')
-    _config(ax, 'Temperature [K]', 'Terminal velocity [m/s]')
+    ax.plot(tks, ut_bed_ganser, 'k--', label='Ganser')
+    ax.plot(tks, ut_bed_haider, 'k-', label='Haider')
+    ax.fill_between(tks, ut_bed_ganser, ut_bed_haider, alpha=0.6, facecolor='khaki', label='bed')
+    ax.plot(tks, ut_bio_ganser, 'k--')
+    ax.plot(tks, ut_bio_haider, 'k-')
+    ax.fill_between(tks, ut_bio_ganser, ut_bio_haider, alpha=0.6, facecolor='lightgreen', label='bio')
+    ax.plot(tks, ut_char_ganser, 'k--')
+    ax.plot(tks, ut_char_haider, 'k-')
+    ax.fill_between(tks, ut_char_ganser, ut_char_haider, alpha=0.6, facecolor='grey', label='char')
+    _config(ax, 'Temperature [K]', 'Terminal velocity, Ut [m/s]')
     ax.legend(bbox_to_anchor=(0., 1.02, 1, 0.102), loc=3, ncol=5, mode='expand', frameon=False)
     fig.savefig(f'{path}/fig_ut_temps.pdf')
 
