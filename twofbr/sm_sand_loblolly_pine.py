@@ -1,36 +1,30 @@
 """
 Parameters for modeling the BFB biomass pyrolysis reactor in the NREL 2FBR
 system. Bed material and biomass feedstock was characterized by NETL.
-
-Bed material
-------------
-250-425 µm Black Rock W-430 sand
-NETL-MAT-237 sample number
-
-Biomass feedstock
------------------
-loblolly pine
-NETL-MAT-241 sample number
 """
 
-# Cases to Simulate
+# Case Information
 # ----------------------------------------------------------------------------
 
 case = {
-    'p': (101_325, 150_000),            # Pressure range [Pa]
-    'q': (14, 24),                      # Volumetric flow range [SLM]
-    'tk': (723.15, 823.15)              # Temperature range [K]
+    'name': 'NREL 2FBR System',
+    'desc': 'Biomass fast pyrolysis reactor',
+    'p': (101_325, 150_000),        # Pressure range [Pa]
+    'q': (14, 24),                  # Volumetric flow range [SLM]
+    'tk': (723.15, 823.15)          # Temperature range [K]
 }
 
 # Bed Particle
 # ----------------------------------------------------------------------------
 
 bed = {
-    'dp': 0.000306,         # Mean particle diameter [m]
-    'dp_min': 0.000219,     # Minimum particle diameter [m]
-    'dp_max': 0.000432,     # Maximum particle diameter [m]
-    'phi': 0.90,            # Sphericity [-]
-    'rho': 2600             # Density [kg/m³]
+    'name': 'Black Rock W-430 sand, 250-425 µm',
+    'sample_id': 'NETL-MAT-237',
+    'dp': 0.000306,                 # Mean particle diameter [m]
+    'dp_min': 0.000219,             # Minimum particle diameter [m]
+    'dp_max': 0.000432,             # Maximum particle diameter [m]
+    'phi': 0.90,                    # Sphericity [-]
+    'rho': 2600                     # Density [kg/m³]
 }
 
 # Biomass Particle
@@ -39,7 +33,11 @@ bed = {
 # Specific gravity (density) and thermal conductivity from Wood Handbook Table 4-7
 
 biomass = {
+    'name': 'Loblolly Pine',
+    'sample_id': 'NETL-MAT-241',
     'dp': 0.000134,         # Mean particle diameter [m]
+    'dp_min': 0.000042,     # Minimum particle diameter [m]
+    'dp_max': 0.000846,     # Maximum particle diameter [m]
     'phi': 0.64,            # Sphericity of biomass particle [-]
     'rho': 540,             # Density of loblolly pine [kg/m³]
     'b': 2,                 # Shape factor for particle transient heat conduction [-]
