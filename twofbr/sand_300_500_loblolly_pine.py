@@ -1,6 +1,16 @@
 """
 Parameters for modeling the BFB biomass pyrolysis reactor in the NREL 2FBR
-system. Bed material (sand) was characterized by NETL.
+system. Bed material and biomass feedstock was characterized by NETL.
+
+Bed material
+------------
+300-500 µm Black Rock W-430 sand
+NETL-MAT-236 sample number
+
+Biomass feedstock
+-----------------
+loblolly pine
+NETL-MAT-241 sample number
 """
 
 # Cases to Simulate
@@ -15,14 +25,11 @@ case = {
 # Bed Particle
 # ----------------------------------------------------------------------------
 
-# 250-425 micron Black Rock W-430 sand
-# sample # NETL-MAT-237
-
 bed = {
-    'dp': 0.000306,         # Mean particle diameter [m]
-    'dp_min': 0.000219,     # Minimum particle diameter [m]
-    'dp_max': 0.000432,     # Maximum particle diameter [m]
-    'phi': 0.90,            # Sphericity [-]
+    'dp': 0.000453,         # Mean particle diameter [m]
+    'dp_min': 0.000322,     # Minimum particle diameter [m]
+    'dp_max': 0.000623,     # Maximum particle diameter [m]
+    'phi': 0.91,            # Sphericity [-]
     'rho': 2600             # Density [kg/m³]
 }
 
@@ -32,8 +39,8 @@ bed = {
 # Specific gravity (density) and thermal conductivity from Wood Handbook Table 4-7
 
 biomass = {
-    'dp': 0.0005,           # Mean particle diameter [m]
-    'phi': 0.6,             # Sphericity of biomass particle [-]
+    'dp': 0.000134,         # Mean particle diameter [m]
+    'phi': 0.64,            # Sphericity of biomass particle [-]
     'rho': 540,             # Density of loblolly pine [kg/m³]
     'b': 2,                 # Shape factor for particle transient heat conduction [-]
     'h': 350,               # Heat transfer coefficient for convection [W/m²K]
