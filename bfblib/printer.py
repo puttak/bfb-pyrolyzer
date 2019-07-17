@@ -10,11 +10,14 @@ def print_params(pm):
     w = 12  # width specifier
 
     pm_string = f"""
-    {'*':*^40}
-    {'Parameters':^40}
-    {'*':*^40}
+    {'=':=^40}
+    {pm.case['name']:^40}
+    {pm.case['desc']:^40}
+    {'=':=^40}
 
     {' Bed Particle ':-^40}\n
+    {pm.bed['name']:<{w}}
+    {pm.bed['sample_id']:<{w}}\n
     {'dp':<{w}} {pm.bed['dp']:<{w}} Mean particle diameter [m]
     {'dp_min':<{w}} {pm.bed['dp_min']:<{w}} Minimum particle diameter [m]
     {'dp_max':<{w}} {pm.bed['dp_max']:<{w}} Maximum particle diameter [m]
@@ -22,6 +25,8 @@ def print_params(pm):
     {'rho':<{w}} {pm.bed['rho']:<{w}} Density [kg/m³]
 
     {' Biomass Particle ':-^40}\n
+    {pm.biomass['name']:<{w}}
+    {pm.biomass['sample_id']:<{w}}\n
     {'dp':<{w}} {pm.biomass['dp']:<{w}} Mean particle diameter [m]
     {'phi':<{w}} {pm.biomass['phi']:<{w}} Particle sphericity [-]
     {'rho':<{w}} {pm.biomass['rho']:<{w}} Density of loblolly pine [kg/m³]
@@ -99,5 +104,6 @@ def print_params_results(bed, bfb, bio, char, gas):
     {'us_umf_ergun':<{w}} {bfb.us_umf.ergun:<{w}.2f} Us/Umf for gas and bed particles [-]
     {'us_umf_wenyu':<{w}} {bfb.us_umf.wenyu:<{w}.2f} Us/Umf for gas and bed particles [-]
     {'zexp_ergun':<{w}} {bfb.zexp.ergun:<{w}.2f} Height of expanded bed [m]
-    {'zexp_wenyu':<{w}} {bfb.zexp.wenyu:<{w}.2f} Height of expanded bed [m]"""
+    {'zexp_wenyu':<{w}} {bfb.zexp.wenyu:<{w}.2f} Height of expanded bed [m]
+    """
     print(textwrap.dedent(res_string))

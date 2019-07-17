@@ -57,7 +57,10 @@ def run_params(pm, path=None):
 
 
 def run_temps(pm, path):
-    print(f"\n{' Simulate Temperatures ':*^40}\n")
+    print_params(pm)
+    print(f"{'*':*^40}")
+    print(f"{'Simulate Temperatures':^40}")
+    print(f"{'*':*^40}\n")
 
     tk_min = pm.case['tk'][0]
     tk_max = pm.case['tk'][1]

@@ -18,32 +18,27 @@ def main(args):
     infile = args.infile.replace('/', '.')[:-3]
     params = importlib.import_module(infile)
 
-    # Run simulation for parameters and save figures if path defined
-    if args.params and args.figs:
+    # Run simulation as defined by command line arguments
+    if args.figs:
         driver.run_params(params, path)
-    elif args.params:
-        driver.run_params(params)
-
-    # Run a simulation for temperatures case and save figures to path
-    if args.temps:
+    elif args.temps:
         driver.run_temps(params, path)
-
-    # Cleanup project directory
-    if args.clean:
+    elif args.clean:
         for file in path.iterdir():
             if file.suffix == '.pdf':
                 file.unlink()
         print(f'Cleaned up files in the `{name}` folder.')
+    else:
+        driver.run_params(params)
 
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
     parser.add_argument('infile', help='path to parameters module file')
-    parser.add_argument('-p', '--params', action='store_true', help='run parameters only')
-    parser.add_argument('-t', '--temps', action='store_true', help='run temperatures case')
-    parser.add_argument('-f', '--figs', action='store_true', help='build and save plot figures')
     parser.add_argument('-c', '--clean', action='store_true', help='remove results folder')
+    parser.add_argument('-f', '--figs', action='store_true', help='build and save plot figures')
+    parser.add_argument('-t', '--temps', action='store_true', help='run temperatures case')
     args = parser.parse_args()
 
     main(args)
