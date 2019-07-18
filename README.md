@@ -13,17 +13,17 @@ Command line options for running the model are shown below.
 
 ```bash
 # Run the model with a specified parameters file
-python main.py twofbr/params.py --params
+python main.py twofbr/lg_sand_loblolly_pine.py
 
 # Run specified parameters file and save figures
-python main.py twofbr/params.py --params --figs
+python main.py twofbr/lg_sand_loblolly_pine.py --figs
 
 # Run the model for a range of temperatures and save figures
 # Temperature range is specified in `case` within parameters file
-python main.py twofbr/params.py --temps
+python main.py twofbr/lg_sand_loblolly_pine.py --temps
 
 # Cleanup the project folder to remove results and figures
-python main.py twofbr/params.p --clean
+python main.py twofbr/lg_sand_loblolly_pine.py --clean
 
 # View available arguments and options
 python main.py --help
@@ -31,7 +31,11 @@ python main.py --help
 
 ## Contributing
 
-Contributions from the community are welcome. Please create a new branch then submit a Pull Request. Questions and other feedback can be submitted on the Issues page.
+Contributions from the community are welcome. Please create a new branch then submit a Pull Request. Questions and other feedback can be submitted on the Issues page. Below are some items that need to be reviewed or added to the model:
+
+- **Run model for multiple cases**. Currently, each case is represented by a single parameters file (Python module) and must be run individually. An approach to run all the parameter files is needed along with comparing the results from each case.
+- **Parameters and Results**. Review current approach for handling parameters and associated results.
+- **Classes**. Review the use of class objects and whether the current approach is reasonable.
 
 ## License
 
