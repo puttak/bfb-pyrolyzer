@@ -53,10 +53,10 @@ class BfbModel:
 
     def calc_tdh(self):
         """
-        Calculate transport disengaging height [m] from Chan and Horio equations.
+        Calculate transport disengaging height [m] from Chan and Horio correlations.
         """
-        tdh_chan = 0.85 * (self.us**1.2) * (7.33 - 1.2 * np.log(self.us))
-        tdh_horio = ((2.7 * self.di ** -0.36) - 0.7) * self.di * np.exp(0.74 * self.us * self.di ** -0.23)
+        tdh_chan = cm.tdh_chan(self.us)
+        tdh_horio = cm.tdh_horio(self.di, self.us)
         self.tdh = Tdh(tdh_chan, tdh_horio)
 
     def calc_zexp(self, bed, gas):
