@@ -1,7 +1,7 @@
 import textwrap
 
 
-def print_params(pm):
+def _params_string(pm):
     """
     Print parameters defined in the parameters module.
     """
@@ -10,13 +10,16 @@ def print_params(pm):
     w = 12  # width specifier
 
     pm_string = f"""
-    {'=':=^40}
-    {pm.case['name']:^40}
-    {pm.case['desc']:^40}
-    {'=':=^40}
+    {pm.case['case_system']}
+    {pm.case['case_reactor']}
+    Case {pm.case['case_num']} - {pm.case['case_desc']}
+
+    {'*':*^40}
+    {'Parameters':^40}
+    {'*':*^40}
 
     {' Bed Particle ':-^40}\n
-    {pm.bed['name']:<{w}}
+    {pm.bed['sample_desc']:<{w}}
     {pm.bed['sample_id']:<{w}}\n
     {'dp':<{w}} {pm.bed['dp']:<{w}} Mean particle diameter [m]
     {'dp_min':<{w}} {pm.bed['dp_min']:<{w}} Minimum particle diameter [m]
@@ -25,7 +28,7 @@ def print_params(pm):
     {'rho':<{w}} {pm.bed['rho']:<{w}} Density [kg/m³]
 
     {' Biomass Particle ':-^40}\n
-    {pm.biomass['name']:<{w}}
+    {pm.biomass['sample_desc']:<{w}}
     {pm.biomass['sample_id']:<{w}}\n
     {'dp':<{w}} {pm.biomass['dp']:<{w}} Mean particle diameter [m]
     {'phi':<{w}} {pm.biomass['phi']:<{w}} Particle sphericity [-]
@@ -57,10 +60,10 @@ def print_params(pm):
     {'q':<{w}} {pm.reactor['q']:<{w}} Volumetric flowrate of gas into reactor [SLM]
     {'zmf':<{w}} {pm.reactor['zmf']:<{w}} Bed height at minimum fluidization [m]
     """
-    print(textwrap.dedent(pm_string))
+    return textwrap.dedent(pm_string)
 
 
-def print_params_results(bed, bfb, bio, char, gas):
+def _results_string(bed, bfb, bio, char, gas):
     """
     Print results calculated from parameters module.
     """
@@ -106,4 +109,16 @@ def print_params_results(bed, bfb, bio, char, gas):
     {'zexp_ergun':<{w}} {bfb.zexp.ergun:<{w}.2f} Height of expanded bed [m]
     {'zexp_wenyu':<{w}} {bfb.zexp.wenyu:<{w}.2f} Height of expanded bed [m]
     """
-    print(textwrap.dedent(res_string))
+    return textwrap.dedent(res_string)
+
+
+def print_report(pm, bed, bfb, bio, char, gas, path):
+    """
+    Write parameters and results file for reporting purposes.
+    """
+    params_string = _params_string(pm)
+    results_string = _results_string(bed, bfb, bio, char, gas)
+
+    with open(path / 'report.txt', 'w') as f:
+        print(params_string, file=f)
+        print(results_string, file=f)
