@@ -5,7 +5,10 @@ import argparse
 import importlib
 import logging
 import pathlib
+
 from bfblib.solver import Solver
+from bfblib.plotter import Plotter
+from bfblib.printer import print_report
 
 
 def main(args):
@@ -19,13 +22,24 @@ def main(args):
 
     # Solve using parameters for each case
     if args.run:
+
         for path in case_paths:
             params_str = str(path / 'params').replace('/', '.')
             params = importlib.import_module(params_str)
+
             solver = Solver(params, path)
             solver.solve_params()
             solver.solve_temps()
             solver.save_results()
+
+            plotter = Plotter(params, solver, path)
+            plotter.plot_geldart()
+            plotter.plot_tdevol_temps()
+            plotter.plot_umf_temps()
+            plotter.plot_ut_temps()
+            plotter.plot_intra_particle_heat_cond()
+
+            print_report(params, solver, path)
 
     # Clean up generated files from previous runs
     if args.clean:
