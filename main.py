@@ -31,23 +31,27 @@ def main(args):
             solver.solve_params()
             solver.solve_temps()
             solver.save_results()
-
-            plotter = Plotter(params, solver, path)
-            plotter.plot_geldart()
-            plotter.plot_tdevol_temps()
-            plotter.plot_umf_temps()
-            plotter.plot_ut_temps()
-            plotter.plot_intra_particle_heat_cond()
-
             print_report(params, solver, path)
+
+        plotter = Plotter(project_path, case_paths)
+        plotter.plot_geldart()
+        plotter.plot_tdevol_temps()
+        plotter.plot_umf_bed()
+        plotter.plot_ut_temps()
+        plotter.plot_intra_particle_heat_cond()
 
     # Clean up generated files from previous runs
     if args.clean:
         logging.info('Clean up generated files from previous runs')
+
         for path in case_paths:
             for file in path.iterdir():
                 if not file.is_dir() and not file.suffix == '.py':
                     file.unlink()
+
+        for file in project_path.iterdir():
+            if file.suffix == '.pdf':
+                file.unlink()
 
     logging.info('End')
 

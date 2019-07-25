@@ -34,7 +34,7 @@ class Solver:
         """
         pm = self._params
 
-        logging.info('Solve Case %s for base parameters', pm.case['case_num'])
+        logging.info('Solve Case %s -> base parameters', pm.case['case_num'])
 
         # Gas properties
         # Note that gas mixture uses the Herning calculation for viscosity
@@ -78,6 +78,10 @@ class Solver:
                 'rho': gas.rho
             },
             'bed': {
+                'dp': pm.bed['dp'],
+                'dp_min': pm.bed['dp_min'],
+                'dp_max': pm.bed['dp_max'],
+                'rho': pm.bed['rho'],
                 'umf_ergun': bed.umf.ergun,
                 'umf_wenyu': bed.umf.wenyu,
                 'ut_ganser': bed.ut.ganser,
@@ -140,7 +144,7 @@ class Solver:
         ut_char_haider = []
 
         for tk in temps:
-            logging.info('Solve Case %s for %s K', pm.case['case_num'], tk)
+            logging.info('Solve Case %s -> %s K', pm.case['case_num'], tk)
 
             # Gas properties at temperature
             # Note that gas mixture uses the Herning calculation for viscosity

@@ -12,18 +12,11 @@ The BFB pyrolysis model was developed with Python 3.7 and the Chemics Python pac
 Command line options for running the model are shown below.
 
 ```bash
-# Run the model with a specified parameters file
-python main.py twofbr/lg_sand_loblolly_pine.py
+# Run the BFB calculations for each case
+python main.py twofbr --run
 
-# Run specified parameters file and save figures
-python main.py twofbr/lg_sand_loblolly_pine.py --figs
-
-# Run the model for a range of temperatures and save figures
-# Temperature range is specified in `case` within parameters file
-python main.py twofbr/lg_sand_loblolly_pine.py --temps
-
-# Cleanup the project folder to remove results and figures
-python main.py twofbr/lg_sand_loblolly_pine.py --clean
+# Cleanup files from previous runs
+python main.py twofbr --clean
 
 # View available arguments and options
 python main.py --help
