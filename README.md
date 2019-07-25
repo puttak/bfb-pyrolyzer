@@ -6,14 +6,15 @@ See the [mfix-bfb-pyrolyzer](https://github.com/ccpcode/mfix-bfb-pyrolyzer) repo
 
 ## Installation and usage
 
-The BFB pyrolysis model was developed with Python 3.7 and the Chemics Python package. To ensure proper execution, the Anaconda Python distribution is recommended for all platforms.
+The BFB pyrolysis model was developed with Python 3.7 and requires the following packages:
 
-- [Anaconda](https://www.anaconda.com/distribution/)
-- [Chemics](https://chemics.github.io)
+- Matplotlib
+- NumPy
+- SciPy
+- Pandas
+- Chemics
 
-Install the BFB pyrolzer model by cloning this repository to your local computer.
-
-To execute the model, run the following command from within the repository folder:
+To execute the model, clone this repository then run the following command from within the repo:
 
 ```bash
 # Run the BFB calculations for each case
