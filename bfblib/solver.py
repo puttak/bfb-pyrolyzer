@@ -1,9 +1,9 @@
 import json
 import logging
 
-from .gas import Gas
-from .particle import Particle
-from .bfb_model import BfbModel
+from gas import Gas
+from particle import Particle
+from bfb_model import BfbModel
 
 
 class Solver:

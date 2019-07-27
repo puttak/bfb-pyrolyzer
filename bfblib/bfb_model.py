@@ -1,6 +1,6 @@
 import chemics as cm
 import numpy as np
-from .helpers import Tdh, UsUmf, Zexp
+from helpers import Tdh, UsUmf, Zexp
 
 
 class BfbModel:

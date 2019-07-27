@@ -18,17 +18,17 @@ To execute the model, clone this repository then run the following command from 
 
 ```bash
 # Run the BFB calculations for each case
-python main.py twofbr --run
+python bfblib twofbr --run
 ```
 
 Other command line options are demonstrated as follows:
 
 ```bash
 # Cleanup files from previous runs
-python main.py twofbr --clean
+python bfblib twofbr --clean
 
 # View available arguments and options
-python main.py --help
+python bfblib --help
 ```
 
 The model performs various calculations based on the input parameters specified in a Python module. This repo provides input parameters for the NREL 2FBR system which are available in the `twofbr` folder. The parameter files are organized by case such as case1 and case2. Each case represents a particular set of input parameters.

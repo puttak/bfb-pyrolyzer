@@ -1,7 +1,7 @@
 import chemics as cm
 import numpy as np
-from .helpers import Umf, Ut
-from .trans_heat_cond import hc2
+from helpers import Umf, Ut
+from trans_heat_cond import hc2
 
 
 class Particle:
