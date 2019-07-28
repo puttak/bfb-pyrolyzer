@@ -1,11 +1,26 @@
 import argparse
 import importlib
 import logging
+import multiprocessing
 import pathlib
 
 from solver import Solver
 from plotter import Plotter
 from printer import print_report
+
+
+def run_solver(path):
+    """
+    """
+    spec = importlib.util.spec_from_file_location('params', path / 'params.py')
+    params = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(params)
+
+    solver = Solver(params, path)
+    solver.solve_params()
+    solver.solve_temps()
+    solver.save_results()
+    print_report(params, solver, path)
 
 
 def main():
@@ -28,16 +43,8 @@ def main():
     # Solve using parameters for each case
     if args.run:
 
-        for path in case_paths:
-            spec = importlib.util.spec_from_file_location('params', path / 'params.py')
-            params = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(params)
-
-            solver = Solver(params, path)
-            solver.solve_params()
-            solver.solve_temps()
-            solver.save_results()
-            print_report(params, solver, path)
+        with multiprocessing.Pool() as pool:
+            pool.map(run_solver, case_paths)
 
         plotter = Plotter(project_path, case_paths)
         plotter.plot_geldart()
