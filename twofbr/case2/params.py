@@ -64,6 +64,8 @@ biomass = {
 
 char = {
     'dp': 0.000134,         # Mean particle diameter [m]
+    'dp_min': 0.000042,     # Minimum particle diameter [m]
+    'dp_max': 0.000846,     # Maximum particle diameter [m]
     'phi': 0.64,            # Sphericity [-]
     'rho': 120              # Density [kg/m³]
 }

@@ -1,5 +1,4 @@
 import json
-import logging
 
 from gas import Gas
 from particle import Particle
@@ -33,8 +32,6 @@ class Solver:
         """
         """
         pm = self._params
-
-        logging.info('Solve Case %s -> base parameters', pm.case['case_num'])
 
         # Gas properties
         # Note that gas mixture uses the Herning calculation for viscosity
@@ -89,6 +86,8 @@ class Solver:
             },
             'bio': {
                 't_devol': bio.t_devol,
+                't_devol_min': bio.t_devol_min,
+                't_devol_max': bio.t_devol_max,
                 't_ref': bio.t_ref,
                 'umf_ergun': bio.umf.ergun,
                 'umf_wenyu': bio.umf.wenyu,
@@ -139,13 +138,13 @@ class Solver:
         ut_bio_ganser = []
         ut_bio_haider = []
         t_devol = []
+        t_devol_min = []
+        t_devol_max = []
 
         ut_char_ganser = []
         ut_char_haider = []
 
         for tk in temps:
-            logging.info('Solve Case %s -> %s K', pm.case['case_num'], tk)
-
             # Gas properties at temperature
             # Note that gas mixture uses the Herning calculation for viscosity
             gas = Gas(pm.gas['sp'], pm.gas['x'], pm.gas['p'], tk)
@@ -171,6 +170,9 @@ class Solver:
             ut_bed_haider.append(bed.ut.haider)
 
             t_devol.append(bio.t_devol)
+            t_devol_min.append(bio.t_devol_min)
+            t_devol_max.append(bio.t_devol_max)
+
             ut_bio_ganser.append(bio.ut.ganser)
             ut_bio_haider.append(bio.ut.haider)
 
@@ -192,6 +194,8 @@ class Solver:
             },
             'bio': {
                 't_devol': t_devol,
+                't_devol_min': t_devol_min,
+                't_devol_max': t_devol_max,
                 'ut_ganser': ut_bio_ganser,
                 'ut_haider': ut_bio_haider
             },

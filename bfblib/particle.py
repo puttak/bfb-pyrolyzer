@@ -30,8 +30,10 @@ class Particle:
         Terminal velocity [m/s]. Values available for `ganser` and `haider`.
     """
 
-    def __init__(self, dp, phi, rho):
+    def __init__(self, dp, dp_min, dp_max, phi, rho):
         self.dp = dp
+        self.dp_min = dp_min
+        self.dp_max = dp_max
         self.phi = phi
         self.rho = rho
 
@@ -41,9 +43,11 @@ class Particle:
         Create class from parameters dictionary.
         """
         dp = params['dp']
+        dp_min = params['dp_min']
+        dp_max = params['dp_max']
         phi = params['phi']
         rho = params['rho']
-        return cls(dp, phi, rho)
+        return cls(dp, dp_min, dp_max, phi, rho)
 
     def calc_umf(self, ep, mug, rhog):
         """
@@ -96,4 +100,8 @@ class Particle:
         Calculate devolatilization time [s] of the biomass particle.
         """
         dp = self.dp * 1000
+        dp_min = self.dp_min * 1000
+        dp_max = self.dp_max * 1000
         self.t_devol = cm.devol_time(dp, tk)
+        self.t_devol_min = cm.devol_time(dp_min, tk)
+        self.t_devol_max = cm.devol_time(dp_max, tk)

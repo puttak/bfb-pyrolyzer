@@ -12,6 +12,8 @@ from printer import print_report
 def run_solver(path):
     """
     """
+    logging.info('Solve for case parameters.')
+
     spec = importlib.util.spec_from_file_location('params', path / 'params.py')
     params = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(params)
@@ -22,9 +24,15 @@ def run_solver(path):
     solver.save_results()
     print_report(params, solver, path)
 
+    plotter = Plotter(solver, path)
+    plotter.plot_geldart()
+    plotter.plot_intra_particle_heat_cond()
+    plotter.plot_tdevol_temps()
+    plotter.plot_umf_temps()
+    plotter.plot_ut_temps()
+
 
 def main():
-
     # Command line arguments
     parser = argparse.ArgumentParser()
     parser.add_argument('project', help='project folder')
@@ -42,16 +50,8 @@ def main():
 
     # Solve using parameters for each case
     if args.run:
-
         with multiprocessing.Pool() as pool:
             pool.map(run_solver, case_paths)
-
-        plotter = Plotter(project_path, case_paths)
-        plotter.plot_geldart()
-        plotter.plot_tdevol_temps()
-        plotter.plot_umf_bed()
-        plotter.plot_ut_temps()
-        plotter.plot_intra_particle_heat_cond()
 
     # Clean up generated files from previous runs
     if args.clean:
