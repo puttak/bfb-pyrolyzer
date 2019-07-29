@@ -1,5 +1,6 @@
 import chemics as cm
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 def _config(ax, xlabel, ylabel):
@@ -9,6 +10,20 @@ def _config(ax, xlabel, ylabel):
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
     ax.tick_params(color='0.9')
+
+
+def _autolabel(ax, bars):
+    """
+    Attach a text label above each bar in *rects*, displaying its height.
+    """
+    for bar in bars:
+        height = bar.get_height()
+        ax.annotate(f'{height:.2f}',
+                    xy=(bar.get_x() + bar.get_width() / 2, height),
+                    xytext=(0, 3),  # 3 points vertical offset
+                    textcoords="offset points",
+                    ha='center',
+                    va='bottom')
 
 
 class Plotter:
@@ -61,12 +76,25 @@ class Plotter:
         t_devol_min = self._results_temps['bio']['t_devol_min']
         t_devol_max = self._results_temps['bio']['t_devol_max']
 
+        x = np.arange(len(temps))   # x-axis label locations
+        width = 0.25                # width of the bars
+
         fig, ax = plt.subplots(tight_layout=True)
-        ax.plot(temps, t_devol, '.-', label='dp')
-        ax.plot(temps, t_devol_min, '.-', label='dp_min')
-        ax.plot(temps, t_devol_max, '.-', label='dp_max')
+        bars_min = ax.bar(x, t_devol_min, width, label='dp_min')
+        bars = ax.bar(x + width, t_devol, width, label='dp')
+        bars_max = ax.bar(x + width * 2, t_devol_max, width, label='dp_max')
+        ax.yaxis.grid(True, color='0.9')
         ax.legend(loc='best')
-        _config(ax, 'Temperature [K]', 'Devolatilization time [s]')
+        ax.set_xticks(x + width)
+        ax.set_xticklabels(temps)
+        ax.set_xlabel('Temperature [K]')
+        ax.set_ylabel('Devolatilization time [s]')
+        ax.set_axisbelow(True)
+        ax.set_frame_on(False)
+        ax.tick_params(color='0.9')
+        _autolabel(ax, bars_min)
+        _autolabel(ax, bars)
+        _autolabel(ax, bars_max)
         fig.savefig(f'{self._path}/fig_tdevol_temps.pdf')
 
     def plot_umf_temps(self):
