@@ -74,6 +74,7 @@ class Plotter:
         Plot Umf of bed particle for all cases.
         """
         temps = self._results_temps['temps']
+        us = self._results_params['bfb']['us']
         umf_bed_ergun = self._results_temps['bed']['umf_ergun']
         umf_bed_wenyu = self._results_temps['bed']['umf_wenyu']
 
@@ -81,6 +82,7 @@ class Plotter:
         ax.plot(temps, umf_bed_ergun, 'k-', marker='.', label='Ergun')
         ax.plot(temps, umf_bed_wenyu, 'k--', marker='.', label='WenYu')
         ax.fill_between(temps, umf_bed_ergun, umf_bed_wenyu)
+        ax.axhline(us, color='r', label='us')
         ax.legend(loc='best')
         _config(ax, 'Temperature [K]', 'Umf [m/s]')
         fig.savefig(f'{self._path}/fig_umf_bed.pdf')
@@ -90,6 +92,7 @@ class Plotter:
         Plot terminal velocity for a range of temperatures.
         """
         temps = self._results_temps['temps']
+        us = self._results_params['bfb']['us']
         ut_bed_ganser = self._results_temps['bed']['ut_ganser']
         ut_bed_haider = self._results_temps['bed']['ut_haider']
         ut_bio_ganser = self._results_temps['bio']['ut_ganser']
@@ -102,6 +105,7 @@ class Plotter:
         ax.plot(temps, ut_bio_ganser, 'k--', marker='.')
         ax.plot(temps, ut_bio_haider, 'k-', marker='.')
         ax.fill_between(temps, ut_bio_ganser, ut_bio_haider, label='bio')
+        ax.axhline(us, color='r', label='us')
         ax.legend(bbox_to_anchor=(0., 1.02, 1, 0.102), loc=3, ncol=5, mode='expand', frameon=False)
         _config(ax, 'Temperature [K]', 'Terminal velocity, Ut [m/s]')
         fig.savefig(f'{self._path}/fig_ut_temps.pdf')
