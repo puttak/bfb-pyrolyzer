@@ -63,7 +63,7 @@ class Particle:
         Calculate terminal velocity [m/s] of the particle.
         """
         mug = mug * 1e-7  # convert to kg/ms = µP * 1e-7
-        _, _, ut_ganser = cm.ut_ganser(self.dp, mug, self.phi, rhog, self.rho)
+        ut_ganser = cm.ut_ganser(self.dp, mug, self.phi, rhog, self.rho)
         ut_haider = cm.ut_haider(self.dp, mug, self.phi, rhog, self.rho)
         self.ut = Ut(ut_ganser, ut_haider)
 

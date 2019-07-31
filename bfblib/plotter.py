@@ -125,15 +125,39 @@ class Plotter:
         ut_bed_haider = self._results_temps['bed']['ut_haider']
         ut_bio_ganser = self._results_temps['bio']['ut_ganser']
         ut_bio_haider = self._results_temps['bio']['ut_haider']
+        ut_char_ganser = self._results_temps['char']['ut_ganser']
+        ut_char_haider = self._results_temps['char']['ut_haider']
 
-        fig, ax = plt.subplots(tight_layout=True)
-        ax.plot(temps, ut_bed_ganser, 'k--', marker='.', label='Ganser')
-        ax.plot(temps, ut_bed_haider, 'k-', marker='.', label='Haider')
-        ax.fill_between(temps, ut_bed_ganser, ut_bed_haider, label='bed')
-        ax.plot(temps, ut_bio_ganser, 'k--', marker='.')
-        ax.plot(temps, ut_bio_haider, 'k-', marker='.')
-        ax.fill_between(temps, ut_bio_ganser, ut_bio_haider, label='bio')
-        ax.axhline(us, color='r', label='us')
-        ax.legend(bbox_to_anchor=(0., 1.02, 1, 0.102), loc=3, ncol=5, mode='expand', frameon=False)
-        _config(ax, 'Temperature [K]', 'Terminal velocity, Ut [m/s]')
+        fig, (ax1, ax2) = plt.subplots(1, 2)
+
+        ln1, = ax1.plot(temps, ut_bed_ganser, 'k--', marker='.')
+        ln2, = ax1.plot(temps, ut_bed_haider, 'k-', marker='.')
+        ln3 = ax1.fill_between(temps, ut_bed_ganser, ut_bed_haider, color='y')
+        ln4 = ax1.axhline(us, color='r', linestyle='-.')
+        ax1.grid(color='0.9')
+        ax1.set_axisbelow(True)
+        ax1.set_frame_on(False)
+        ax1.tick_params(color='0.9')
+
+        ax2.plot(temps, ut_bio_ganser, 'k--', marker='.')
+        ax2.plot(temps, ut_bio_haider, 'k-', marker='.')
+        ln5 = ax2.fill_between(temps, ut_bio_ganser, ut_bio_haider, color='g')
+        ax2.plot(temps, ut_char_ganser, 'k--', marker='.')
+        ax2.plot(temps, ut_char_haider, 'k-', marker='.')
+        ln6 = ax2.fill_between(temps, ut_char_ganser, ut_char_haider, color='slategrey')
+        ax2.axhline(us, color='r', linestyle='-.', label='Us')
+        ax2.grid(color='0.9')
+        ax2.set_axisbelow(True)
+        ax2.set_frame_on(False)
+        ax2.tick_params(color='0.9')
+
+        lines = (ln1, ln2, ln4, ln3, ln5, ln6)
+        labels = ('Ganser', 'Haider', 'Us', 'bed', 'bio', 'char')
+
+        fig.add_subplot(111, frameon=False)
+        plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
+        plt.xlabel('Temperature [K]')
+        plt.ylabel('Ut, terminal velocity [m/s]')
+        plt.legend(lines, labels, bbox_to_anchor=(0., 1.02, 1, 0.102), loc=3, ncol=6, mode='expand', frameon=False)
+
         fig.savefig(f'{self._path}/fig_ut_temps.pdf')
