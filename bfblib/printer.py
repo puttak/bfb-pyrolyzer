@@ -85,6 +85,7 @@ def _results_string(results):
     {'rho':<{w}} {gas['rho']:<{w}.4f} Density [kg/m³]
 
     {' Bed Particle ':-^40}\n
+    {'umb':<{w}} {bed['umb']:<{w}.4f} Minimum bubbling velocity [m/s]
     {'umf_ergun':<{w}} {bed['umf_ergun']:<{w}.4f} Minimum fluidization velocity [m/s]
     {'umf_wenyu':<{w}} {bed['umf_wenyu']:<{w}.4f} Minimum fluidization velocity [m/s]
     {'ut_ganser':<{w}} {bed['ut_ganser']:<{w}.2f} Terminal velocity [m/s]

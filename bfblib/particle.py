@@ -24,6 +24,8 @@ class Particle:
         Time when particle is near reactor temperature [s]
     tk : array
         Intra-particle temperature [K]
+    umb : float
+        Minimum bubbling velocity [m/s]
     umf : namedtuple
         Minimum fluidization velocity [m/s]. Values available for `ergun` and `wenyu`.
     ut : namedtuple
@@ -48,6 +50,15 @@ class Particle:
         phi = params['phi']
         rho = params['rho']
         return cls(dp, dp_min, dp_max, phi, rho)
+
+    def calc_umb(self, mug, rhog):
+        """
+        Calculate minimum bubbling velocity [m/s] from Abrahamsen correlation.
+        """
+        frac = 0.001        # wt. fraction of fines < 45 um
+        mug = mug * 1e-7    # convert to kg/ms = µP * 1e-7
+        umb = 2.07 * np.exp(0.716 * frac) * (self.dp * rhog**0.06) / (mug**0.347)
+        self.umb = umb
 
     def calc_umf(self, ep, mug, rhog):
         """

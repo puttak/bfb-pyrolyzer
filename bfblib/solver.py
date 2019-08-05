@@ -39,6 +39,7 @@ class Solver:
 
         # Bed particle
         bed = Particle.from_params(pm.bed)
+        bed.calc_umb(gas.mu, gas.rho)
         bed.calc_umf(pm.reactor['ep'], gas.mu, gas.rho)
         bed.calc_ut(gas.mu, gas.rho)
 
@@ -79,6 +80,7 @@ class Solver:
                 'dp_min': pm.bed['dp_min'],
                 'dp_max': pm.bed['dp_max'],
                 'rho': pm.bed['rho'],
+                'umb': bed.umb,
                 'umf_ergun': bed.umf.ergun,
                 'umf_wenyu': bed.umf.wenyu,
                 'ut_ganser': bed.ut.ganser,
