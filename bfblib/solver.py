@@ -2,7 +2,7 @@ import json
 
 from gas import Gas
 from particle import Particle
-from bfb_model import BfbModel
+from bfbreactor import BfbReactor
 
 
 class Solver:
@@ -58,7 +58,7 @@ class Solver:
         char.calc_ut(gas.mu, gas.rho)
 
         # BFB reactor model
-        bfb = BfbModel(pm.reactor['di'], pm.reactor['q'], pm.reactor['zmf'])
+        bfb = BfbReactor(pm.reactor['di'], pm.reactor['q'], pm.reactor['zmf'])
         bfb.calc_us(gas)
         bfb.calc_us_umf(bed)
         bfb.calc_tdh()

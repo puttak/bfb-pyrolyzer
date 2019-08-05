@@ -3,7 +3,7 @@ import numpy as np
 from helpers import Tdh, UsUmf, Zexp
 
 
-class BfbModel:
+class BfbReactor:
     """
     Bubbling fluidized bed model.
 
