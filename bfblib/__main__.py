@@ -27,6 +27,7 @@ def run_solver(path):
     plotter = Plotter(solver, path)
     plotter.plot_geldart()
     plotter.plot_intra_particle_heat_cond()
+    plotter.plot_umb_umf_ut_params()
     plotter.plot_tdevol_temps()
     plotter.plot_umf_temps()
     plotter.plot_ut_temps()

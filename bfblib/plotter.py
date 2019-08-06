@@ -12,13 +12,20 @@ def _config(ax, xlabel, ylabel):
     ax.tick_params(color='0.9')
 
 
+def _config_bar(ax):
+    ax.grid(color='0.9')
+    ax.set_axisbelow(True)
+    ax.set_frame_on(False)
+    ax.tick_params(color='0.9')
+
+
 def _autolabel(ax, bars):
     """
     Attach a text label above each bar in *rects*, displaying its height.
     """
     for bar in bars:
         height = bar.get_height()
-        ax.annotate(f'{height:.2f}',
+        ax.annotate(f'{height:.2g}',
                     xy=(bar.get_x() + bar.get_width() / 2, height),
                     xytext=(0, 3),  # 3 points vertical offset
                     textcoords="offset points",
@@ -66,6 +73,51 @@ class Plotter:
         ax.legend(loc='best')
         _config(ax, 'Time [s]', 'Temperature [K]')
         fig.savefig(f'{self._path}/fig_intra_hc.pdf')
+
+    def plot_umb_umf_ut_params(self):
+        """
+        """
+        us = self._results_params['bfb']['us']
+
+        umb = self._results_params['bed']['umb']
+        umf_ergun = self._results_params['bed']['umf_ergun']
+        umf_wenyu = self._results_params['bed']['umf_wenyu']
+
+        ut_bed_ganser = self._results_params['bed']['ut_ganser']
+        ut_bed_haider = self._results_params['bed']['ut_haider']
+
+        ut_bio_ganser = self._results_params['bio']['ut_ganser']
+        ut_bio_haider = self._results_params['bio']['ut_haider']
+        ut_char_ganser = self._results_params['char']['ut_ganser']
+        ut_char_haider = self._results_params['char']['ut_haider']
+
+        gs = {'width_ratios': [1, 3]}
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10.4, 4.8), gridspec_kw=gs, tight_layout=True)
+
+        b1, = ax1.bar('umb_bed', umb, color='tan')
+        b2, = ax1.bar('umf_bed_ergun', umf_ergun, color='tan')
+        b3, = ax1.bar('umf_bed_wenYu', umf_wenyu, color='tan')
+        ax1.set_xticklabels(['Umb', 'Umf\nErgun', 'Umf\nWenYu'])
+        ax1.set_ylabel('Velocity [m/s]')
+        _autolabel(ax1, [b1, b2, b3])
+        _config_bar(ax1)
+
+        b4, = ax2.bar('ut_bed_ganser', ut_bed_ganser, color='tan')
+        b5, = ax2.bar('ut_bed_haider', ut_bed_haider, color='tan')
+        b6, = ax2.bar('ut_bio_ganser', ut_bio_ganser, color='forestgreen')
+        b7, = ax2.bar('ut_bio_haider', ut_bio_haider, color='forestgreen')
+        b8, = ax2.bar('ut_char_ganser', ut_char_ganser, color='slategrey')
+        b9, = ax2.bar('ut_char_haider', ut_char_haider, color='slategrey')
+        l1 = ax2.axhline(us, color='r', alpha=0.6)
+        ax2.set_xticklabels(['Ut\nGanser', 'Ut\nHaider', 'Ut\nGanser', 'Ut\nHaider', 'Ut\nGanser', 'Ut\nHaider'])
+        ax2.set_ylabel('Velocity [m/s]')
+        _autolabel(ax2, [b4, b5, b6, b7, b8, b9])
+        _config_bar(ax2)
+
+        bars = [l1, b1, b6, b8]
+        labels = ['Us', 'Bed', 'Biomass', 'Char']
+        ax2.legend(bars, labels, loc='best')
+        fig.savefig(f'{self._path}/fig_umb_umf_ut_params.pdf')
 
     def plot_tdevol_temps(self):
         """
