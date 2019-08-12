@@ -60,6 +60,21 @@ class Particle:
         umb = 2.07 * np.exp(0.716 * frac) * (self.dp * rhog**0.06) / (mug**0.347)
         self.umb = umb
 
+    def calc_umb_umf(self, mug, rhog):
+        """
+        Calculate Umb/Umf according to the Abrahamsen paper. Note that Umf is
+        the Baeyens equation.
+        """
+        frac = 0.001        # wt. fraction of fines < 45 um
+        g = 9.81            # acceleration due to gravity [m/s²]
+        mug = mug * 1e-7    # convert to kg/ms = µP * 1e-7
+        rhop = self.rho
+
+        x = 2300 * rhog**0.126 * mug**0.523 * np.exp(0.716 * frac)
+        y = self.dp**0.8 * g**0.934 * (rhop - rhog)**0.934
+        umb_umf = x / y
+        self.umb_umf = umb_umf
+
     def calc_umf(self, ep, mug, rhog):
         """
         Calculate minimum fluidization velocity [m/s] of the particle.

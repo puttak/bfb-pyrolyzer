@@ -40,6 +40,7 @@ class Solver:
         # Bed particle
         bed = Particle.from_params(pm.bed)
         bed.calc_umb(gas.mu, gas.rho)
+        bed.calc_umb_umf(gas.mu, gas.rho)
         bed.calc_umf(pm.reactor['ep'], gas.mu, gas.rho)
         bed.calc_ut(gas.mu, gas.rho)
 
@@ -81,6 +82,7 @@ class Solver:
                 'dp_max': pm.bed['dp_max'],
                 'rho': pm.bed['rho'],
                 'umb': bed.umb,
+                'umb_umf': bed.umb_umf,
                 'umf_ergun': bed.umf.ergun,
                 'umf_wenyu': bed.umf.wenyu,
                 'ut_ganser': bed.ut.ganser,
@@ -132,6 +134,7 @@ class Solver:
         mu = []
         rho = []
 
+        umb_bed = []
         umf_bed_ergun = []
         umf_bed_wenyu = []
         ut_bed_ganser = []
@@ -152,6 +155,7 @@ class Solver:
             gas = Gas(pm.gas['sp'], pm.gas['x'], pm.gas['p'], tk)
 
             # Bed particle
+            bed.calc_umb(gas.mu, gas.rho)
             bed.calc_umf(pm.reactor['ep'], gas.mu, gas.rho)
             bed.calc_ut(gas.mu, gas.rho)
 
@@ -166,6 +170,7 @@ class Solver:
             mu.append(gas.mu)
             rho.append(gas.rho)
 
+            umb_bed.append(bed.umb)
             umf_bed_ergun.append(bed.umf.ergun)
             umf_bed_wenyu.append(bed.umf.wenyu)
             ut_bed_ganser.append(bed.ut.ganser)
@@ -189,6 +194,7 @@ class Solver:
                 'rho': rho
             },
             'bed': {
+                'umb': umb_bed,
                 'umf_ergun': umf_bed_ergun,
                 'umf_wenyu': umf_bed_wenyu,
                 'ut_ganser': ut_bed_ganser,
