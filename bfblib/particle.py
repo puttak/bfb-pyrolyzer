@@ -51,6 +51,13 @@ class Particle:
         rho = params['rho']
         return cls(dp, dp_min, dp_max, phi, rho)
 
+    def calc_dps(self, dpmin=0.00001, dpmax=0.001):
+        """
+        Range of particle diameters for certain calculations.
+        """
+        dps = np.linspace(dpmin, dpmax)
+        self.dps = dps
+
     def calc_umb(self, mug, rhog):
         """
         Calculate minimum bubbling velocity [m/s] from Abrahamsen correlation.
@@ -92,6 +99,21 @@ class Particle:
         ut_ganser = cm.ut_ganser(self.dp, mug, self.phi, rhog, self.rho)
         ut_haider = cm.ut_haider(self.dp, mug, self.phi, rhog, self.rho)
         self.ut = Ut(ut_ganser, ut_haider)
+
+    def calc_uts_dps(self, mug, rhog, dpmin=0.00001, dpmax=0.001):
+        """
+        Calculate terminal velocity [m/s] for a range of particle diameters.
+        """
+        mug = mug * 1e-7  # convert to kg/ms = µP * 1e-7
+        ut_ganser = []
+        ut_haider = []
+
+        for dp in self.dps:
+            ut_ganser.append(cm.ut_ganser(dp, mug, self.phi, rhog, self.rho))
+            ut_haider.append(cm.ut_haider(dp, mug, self.phi, rhog, self.rho))
+
+        self.uts_ganser = ut_ganser
+        self.uts_haider = ut_haider
 
     def build_time_vector(self, nt, t_max):
         """

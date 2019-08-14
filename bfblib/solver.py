@@ -52,13 +52,15 @@ class Solver:
         bio.calc_trans_hc(pm.biomass['b'], pm.biomass['h'], pm.biomass['k'], pm.biomass['m'], pm.biomass['mc'], pm.biomass['tk_init'], gas.tk)
         bio.calc_time_tkinf(gas.tk)
         bio.calc_devol_time(gas.tk)
+        bio.calc_dps()
+        bio.calc_uts_dps(gas.mu, gas.rho)
 
         # Char particle
         char = Particle.from_params(pm.char)
         char.calc_umf(pm.reactor['ep'], gas.mu, gas.rho)
         char.calc_ut(gas.mu, gas.rho)
 
-        # BFB reactor model
+        # BFB reactor
         bfb = BfbReactor(pm.reactor['di'], pm.reactor['q'], pm.reactor['zmf'])
         bfb.calc_us(gas)
         bfb.calc_us_umf(bed)
@@ -99,7 +101,13 @@ class Solver:
                 'ut_haider': bio.ut.haider,
                 't_hc': bio.t.tolist(),
                 'tk_center_hc': bio.tk[:, 0].tolist(),
-                'tk_surface_hc': bio.tk[:, -1].tolist()
+                'tk_surface_hc': bio.tk[:, -1].tolist(),
+                'dps': bio.dps.tolist(),
+                'dp': bio.dp,
+                'dp_min': bio.dp_min,
+                'dp_max': bio.dp_max,
+                'uts_ganser': bio.uts_ganser,
+                'uts_haider': bio.uts_haider
             },
             'char': {
                 'umf_ergun': char.umf.ergun,
@@ -135,6 +143,7 @@ class Solver:
         rho = []
 
         umb_bed = []
+        umb_umf_bed = []
         umf_bed_ergun = []
         umf_bed_wenyu = []
         ut_bed_ganser = []
@@ -149,6 +158,9 @@ class Solver:
         ut_char_ganser = []
         ut_char_haider = []
 
+        us_umf_ergun = []
+        us_umf_wenyu = []
+
         for tk in temps:
             # Gas properties at temperature
             # Note that gas mixture uses the Herning calculation for viscosity
@@ -156,21 +168,28 @@ class Solver:
 
             # Bed particle
             bed.calc_umb(gas.mu, gas.rho)
+            bed.calc_umb_umf(gas.mu, gas.rho)
             bed.calc_umf(pm.reactor['ep'], gas.mu, gas.rho)
             bed.calc_ut(gas.mu, gas.rho)
 
-            # Biomass particle calculations
+            # Biomass particle
             bio.calc_ut(gas.mu, gas.rho)
             bio.calc_devol_time(gas.tk)
 
-            # Char particle calculations
+            # Char particle
             char.calc_ut(gas.mu, gas.rho)
+
+            # BFB reactor
+            bfb = BfbReactor(pm.reactor['di'], pm.reactor['q'], pm.reactor['zmf'])
+            bfb.calc_us(gas)
+            bfb.calc_us_umf(bed)
 
             # Store results for temperature
             mu.append(gas.mu)
             rho.append(gas.rho)
 
             umb_bed.append(bed.umb)
+            umb_umf_bed.append(bed.umb_umf)
             umf_bed_ergun.append(bed.umf.ergun)
             umf_bed_wenyu.append(bed.umf.wenyu)
             ut_bed_ganser.append(bed.ut.ganser)
@@ -186,6 +205,9 @@ class Solver:
             ut_char_ganser.append(char.ut.ganser)
             ut_char_haider.append(char.ut.haider)
 
+            us_umf_ergun.append(bfb.us_umf.ergun)
+            us_umf_wenyu.append(bfb.us_umf.wenyu)
+
         results_temps = {
             'name': 'results_temps',
             'temps': temps,
@@ -195,6 +217,7 @@ class Solver:
             },
             'bed': {
                 'umb': umb_bed,
+                'umb_umf': umb_umf_bed,
                 'umf_ergun': umf_bed_ergun,
                 'umf_wenyu': umf_bed_wenyu,
                 'ut_ganser': ut_bed_ganser,
@@ -210,6 +233,10 @@ class Solver:
             'char': {
                 'ut_ganser': ut_char_ganser,
                 'ut_haider': ut_char_haider
+            },
+            'bfb': {
+                'us_umf_ergun': us_umf_ergun,
+                'us_umf_wenyu': us_umf_wenyu
             }
         }
 

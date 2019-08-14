@@ -70,7 +70,7 @@ class Plotter:
         ax.plot(t, tk_surface, label='surface')
         ax.axvline(t_devol, c='m', ls='--', label='t_devol')
         ax.axvline(t_ref, c='k', ls='--', label='t_ref')
-        ax.legend(loc='best')
+        ax.legend(loc='lower right')
         _config(ax, 'Time [s]', 'Temperature [K]')
         fig.savefig(f'{self._path}/fig_intra_hc.pdf')
 
@@ -116,7 +116,7 @@ class Plotter:
 
         bars = [l1, b1, b6, b8]
         labels = ['Us', 'Bed', 'Biomass', 'Char']
-        ax2.legend(bars, labels, loc='best')
+        ax2.legend(bars, labels, loc='upper right')
         fig.savefig(f'{self._path}/fig_umb_umf_ut_params.pdf')
 
     def plot_tdevol_temps(self):
@@ -136,7 +136,7 @@ class Plotter:
         bars = ax.bar(x + width, t_devol, width, color='limegreen', label='dp_mean')
         bars_max = ax.bar(x + width * 2, t_devol_max, width, color='forestgreen', label='dp_max')
         ax.yaxis.grid(True, color='0.9')
-        ax.legend(loc='best')
+        ax.legend(loc='upper right')
         ax.set_xticks(x + width)
         ax.set_xticklabels(temps)
         ax.set_xlabel('Temperature [K]')
@@ -155,15 +155,27 @@ class Plotter:
         """
         temps = self._results_temps['temps']
         umb_bed = self._results_temps['bed']['umb']
+        umb_umf_bed = self._results_temps['bed']['umb_umf']
         umf_bed_ergun = self._results_temps['bed']['umf_ergun']
         umf_bed_wenyu = self._results_temps['bed']['umf_wenyu']
+        us_umf_ergun = self._results_temps['bfb']['us_umf_ergun']
+        us_umf_wenyu = self._results_temps['bfb']['us_umf_wenyu']
 
-        fig, ax = plt.subplots(tight_layout=True)
-        ax.plot(temps, umb_bed, marker='.', label='Umb')
-        ax.plot(temps, umf_bed_ergun, marker='.', label='Umf_Ergun')
-        ax.plot(temps, umf_bed_wenyu, marker='.', label='Umf_WenYu')
-        ax.legend(loc='best')
-        _config(ax, 'Temperature [K]', 'Velocity [m/s]')
+        fig, (ax1, ax2) = plt.subplots(1, 2, tight_layout=True)
+
+        ax1.plot(temps, umb_bed, marker='.', label='Umb')
+        ax1.plot(temps, umf_bed_ergun, marker='.', label='Umf_Ergun')
+        ax1.plot(temps, umf_bed_wenyu, marker='.', label='Umf_WenYu')
+        ax1.legend(loc='best')
+        ax1.set_xticks([int(x) for x in temps])
+        _config(ax1, 'Temperature [K]', 'Velocity [m/s]')
+
+        ax2.plot(temps, umb_umf_bed, marker='.', label='Umb/Umf')
+        ax2.plot(temps, us_umf_ergun, marker='.', label='Ergun')
+        ax2.plot(temps, us_umf_wenyu, marker='.', label='WenYu')
+        ax2.set_xticks([int(x) for x in temps])
+        _config(ax2, 'Temperature [K]', 'Velocity ratio [-]')
+
         fig.savefig(f'{self._path}/fig_umb_umf_temps.pdf')
 
     def plot_ut_temps(self):
@@ -179,76 +191,64 @@ class Plotter:
         ut_char_ganser = self._results_temps['char']['ut_ganser']
         ut_char_haider = self._results_temps['char']['ut_haider']
 
-        fig, (ax1, ax2) = plt.subplots(1, 2)
-
-        ln1, = ax1.plot(temps, ut_bed_ganser, 'k--', marker='.')
-        ln2, = ax1.plot(temps, ut_bed_haider, 'k-', marker='.')
-        ln3 = ax1.fill_between(temps, ut_bed_ganser, ut_bed_haider, color='y')
-        ln4 = ax1.axhline(us, color='r', alpha=0.6)
-        ax1.grid(color='0.9')
-        ax1.set_axisbelow(True)
-        ax1.set_frame_on(False)
-        ax1.tick_params(color='0.9')
-
-        ax2.plot(temps, ut_bio_ganser, 'k--', marker='.')
-        ax2.plot(temps, ut_bio_haider, 'k-', marker='.')
-        ln5 = ax2.fill_between(temps, ut_bio_ganser, ut_bio_haider, color='g')
-        ax2.plot(temps, ut_char_ganser, 'k--', marker='.')
-        ax2.plot(temps, ut_char_haider, 'k-', marker='.')
-        ln6 = ax2.fill_between(temps, ut_char_ganser, ut_char_haider, color='slategrey')
-        ax2.axhline(us, color='r', alpha=0.6, label='Us')
-        ax2.grid(color='0.9')
-        ax2.set_axisbelow(True)
-        ax2.set_frame_on(False)
-        ax2.tick_params(color='0.9')
-
-        lines = (ln1, ln2, ln4, ln3, ln5, ln6)
-        labels = ('Ganser', 'Haider', 'Us', 'bed', 'bio', 'char')
-
-        fig.add_subplot(111, frameon=False)
-        plt.tick_params(labelcolor='none', top=False, bottom=False, left=False, right=False)
-        plt.xlabel('Temperature [K]')
-        plt.ylabel('Ut, terminal velocity [m/s]')
-        plt.legend(lines, labels, bbox_to_anchor=(0., 1.02, 1, 0.102), loc=3, ncol=6, mode='expand', frameon=False)
-
-        fig.savefig(f'{self._path}/fig_ut_temps.pdf')
-
-    def plot_velocity_temps(self):
-        """
-        """
-        temps = self._results_temps['temps']
-
-        us = self._results_params['bfb']['us']
-        ut_bed_ganser = self._results_temps['bed']['ut_ganser']
-        ut_bed_haider = self._results_temps['bed']['ut_haider']
-        ut_bio_ganser = self._results_temps['bio']['ut_ganser']
-        ut_bio_haider = self._results_temps['bio']['ut_haider']
-        ut_char_ganser = self._results_temps['char']['ut_ganser']
-        ut_char_haider = self._results_temps['char']['ut_haider']
-
         fig, (ax1, ax2, ax3) = plt.subplots(1, 3, tight_layout=True)
 
-        ax1.plot(temps, ut_bed_ganser, marker='.')
-        ax1.plot(temps, ut_bed_haider, marker='.')
-        ax1.axhline(us, color='r', alpha=0.6)
+        ax1.plot(temps, ut_bed_ganser, 'k--', marker='.')
+        ax1.plot(temps, ut_bed_haider, 'k-', marker='.')
+        ax1.fill_between(temps, ut_bed_ganser, ut_bed_haider, color='tan')
+        ax1.axhline(us, color='r')
         ax1.set_xticks([int(x) for x in temps])
         ax1.set_ylabel('Terminal velocity, Ut [m/s]')
         ax1.set_title('Bed')
         _config_axis(ax1)
 
-        ax2.plot(temps, ut_bio_ganser, marker='.')
-        ax2.plot(temps, ut_bio_haider, marker='.')
-        ax2.axhline(us, color='r', alpha=0.6)
+        ax2.plot(temps, ut_bio_ganser, 'k--', marker='.')
+        ax2.plot(temps, ut_bio_haider, 'k-', marker='.')
+        ax2.fill_between(temps, ut_bio_ganser, ut_bio_haider, color='forestgreen')
+        ax2.axhline(us, color='r')
         ax2.set_xticks([int(x) for x in temps])
         ax2.set_xlabel('Temperature [K]')
         ax2.set_title('Biomass')
         _config_axis(ax2)
 
-        ax3.plot(temps, ut_char_ganser, marker='.')
-        ax3.plot(temps, ut_char_haider, marker='.')
-        ax3.axhline(us, color='r', alpha=0.6)
+        ax3.plot(temps, ut_char_ganser, 'k--', marker='.', label='Ganser')
+        ax3.plot(temps, ut_char_haider, 'k-', marker='.', label='Haider')
+        ax3.fill_between(temps, ut_char_ganser, ut_char_haider, color='slategrey')
+        ax3.axhline(us, color='r', label='Us')
         ax3.set_xticks([int(x) for x in temps])
         ax3.set_title('Char')
+        ax3.legend(loc='center left', bbox_to_anchor=(1.0, 0.5), frameon=False)
         _config_axis(ax3)
 
-        fig.savefig(f'{self._path}/fig_velocity_temps.pdf')
+        fig.savefig(f'{self._path}/fig_ut_temps.pdf')
+
+    def plot_uts_dps(self):
+        """
+        """
+        dps = self._results_params['bio']['dps']
+        dps = [dp * 1000 for dp in dps]
+
+        dp = self._results_params['bio']['dp']
+        dp_min = self._results_params['bio']['dp_min']
+        dp_max = self._results_params['bio']['dp_max']
+        ut_ganser = self._results_params['bio']['uts_ganser']
+        ut_haider = self._results_params['bio']['uts_haider']
+        us = self._results_params['bfb']['us']
+
+        fig, ax = plt.subplots(tight_layout=True)
+        ax.plot(dps, ut_ganser, label='Ganser')
+        ax.plot(dps, ut_haider, label='Haider')
+        ax.fill_between(dps, ut_ganser, ut_haider, alpha=0.2, color='gray')
+        ax.axhline(us, color='r', zorder=1, label='Us')
+        ax.axvline(dp_min * 1000, color='c', linestyle='--', label='Dp min')
+        ax.axvline(dp * 1000, color='k', linestyle='--', label='Dp mean')
+        ax.axvline(dp_max * 1000, color='m', linestyle='--', label='Dp max')
+        ax.set_xlabel('Diameter [mm]')
+        ax.set_ylabel('Terminal velocity, Ut [m/s]')
+        ax.grid(color='0.9')
+        ax.legend(loc='center left', bbox_to_anchor=(1, 0.5), frameon=False)
+        ax.set_axisbelow(True)
+        ax.set_frame_on(False)
+        ax.tick_params(color='0.9')
+
+        fig.savefig(f'{self._path}/fig_uts_dps.pdf')

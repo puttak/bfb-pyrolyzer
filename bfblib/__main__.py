@@ -36,7 +36,7 @@ def run_solver(path, ncase=None):
     plotter.plot_tdevol_temps()
     plotter.plot_umb_umf_temps()
     plotter.plot_ut_temps()
-    plotter.plot_velocity_temps()
+    plotter.plot_uts_dps()
 
 
 def main():
