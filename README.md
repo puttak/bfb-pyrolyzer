@@ -19,6 +19,9 @@ The main entry point for the program is `__main__.py` which is located in the `b
 ```bash
 # Run the BFB calculations for each case
 python bfblib twofbr --run
+
+# Run the BFB calculations for each case in parallel
+python bfblib twofbr --mprun
 ```
 
 Other command line options are demonstrated as follows:

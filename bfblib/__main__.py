@@ -4,39 +4,91 @@ import logging
 import multiprocessing
 import pathlib
 
-from solver import Solver
-from plotter import Plotter
-from printer import print_report
+from solve_parameters import SolveParameters
+from plot_parameters import PlotParameters
+from print_parameters import print_report
+
+from solve_diameters import SolveDiameters
+from plot_diameters import PlotDiameters
+
+from solve_temperatures import SolveTemperatures
+from plot_temperatures import PlotTemperatures
 
 
-def run_solver(path, ncase=None):
+def solve_parameters(path):
     """
-    Perform calculations for each case.
+    Perform calculations for parameters file.
     """
-
-    if ncase is None:
-        logging.info('Solve for case parameters.')
-    else:
-        logging.info(f'Solve for case {ncase} parameters.')
+    logging.info('Solve for case parameters')
 
     spec = importlib.util.spec_from_file_location('params', path / 'params.py')
     params = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(params)
 
-    solver = Solver(params, path)
-    solver.solve_params()
-    solver.solve_temps()
-    solver.save_results()
+    solver = SolveParameters(params)
+    solver.calc_results()
     print_report(params, solver, path)
 
-    plotter = Plotter(solver, path)
+    plotter = PlotParameters(solver, path)
     plotter.plot_geldart()
     plotter.plot_intra_particle_heat_cond()
-    plotter.plot_umb_umf_ut_params()
-    plotter.plot_tdevol_temps()
+    plotter.plot_umb_umf_ut()
+
+
+def solve_diameters(path):
+    """
+    Perform calculations for a range of particle sizes.
+    """
+    logging.info('Solve for diameters')
+
+    spec = importlib.util.spec_from_file_location('params', path / 'params.py')
+    params = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(params)
+
+    solver = SolveDiameters(params)
+    solver.calc_diameters()
+    solver.calc_us()
+    solver.calc_umf()
+    solver.calc_ut()
+
+    plotter = PlotDiameters(solver, path)
+    plotter.plot_umf_bed()
+    plotter.plot_ut_bed()
+    plotter.plot_ut_biomass()
+
+
+def solve_temperatures(path):
+    """
+    """
+    logging.info('Solve for temperatures')
+
+    spec = importlib.util.spec_from_file_location('params', path / 'params.py')
+    params = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(params)
+
+    solver = SolveTemperatures(params)
+    solver.get_temperatures()
+    solver.calc_tv()
+    solver.calc_us()
+    solver.calc_us_umf()
+    solver.calc_umb()
+    solver.calc_umb_umf()
+    solver.calc_umf()
+    solver.calc_ut()
+
+    plotter = PlotTemperatures(solver, path)
+    plotter.plot_tv_temps()
+    plotter.plot_umf_ratios_temps()
     plotter.plot_umb_umf_temps()
     plotter.plot_ut_temps()
-    plotter.plot_uts_dps()
+
+
+def run_solvers(path):
+    """
+    """
+    solve_parameters(path)
+    solve_diameters(path)
+    solve_temperatures(path)
 
 
 def main():
@@ -62,13 +114,13 @@ def main():
 
     # Solve using parameters for each case (serial)
     if args.run:
-        for n, path in enumerate(case_paths):
-            run_solver(path, ncase=n + 1)
+        for path in case_paths:
+            run_solvers(path)
 
     # Solve using parameters for each case (parallel)
     if args.mprun:
         with multiprocessing.Pool() as pool:
-            pool.map(run_solver, case_paths)
+            pool.map(run_solvers, case_paths)
 
     # Clean up generated files from previous runs
     if args.clean:
@@ -83,7 +135,7 @@ def main():
             if file.suffix == '.pdf':
                 file.unlink()
 
-    logging.info('End')
+    logging.info('Done')
 
 
 if __name__ == '__main__':

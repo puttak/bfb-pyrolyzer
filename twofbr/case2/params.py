@@ -59,17 +59,6 @@ biomass = {
     'tk_init': 293.15       # Initial particle temperature [K]
 }
 
-# Char particle
-# ----------------------------------------------------------------------------
-
-char = {
-    'dp': 0.000134,         # Mean particle diameter [m]
-    'dp_min': 0.000042,     # Minimum particle diameter [m]
-    'dp_max': 0.000846,     # Maximum particle diameter [m]
-    'phi': 0.64,            # Sphericity [-]
-    'rho': 120              # Density [kg/m³]
-}
-
 # Gas Properties
 # ----------------------------------------------------------------------------
 
@@ -77,7 +66,9 @@ gas = {
     'sp': ['H2', 'N2'],     # Gas species of each component in gas mixture [-]
     'x': [0.85, 0.15],      # Mole fraction of each component in gas mixture [-]
     'p': 101_325,           # Gas pressure in reactor [Pa]
-    'tk': 773.15            # Gas temperature [K]
+    'tk': 773.15,           # Mean temperature [K]
+    'tk_min': 673.15,       # Minimum temperature [K]
+    'tk_max': 873.15,       # Maximum temperature [K]
 }
 
 # Reactor Geometry and Conditions
