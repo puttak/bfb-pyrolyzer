@@ -34,9 +34,9 @@ def _config(ax, xlabel, ylabel):
 
 class PlotParameters:
 
-    def __init__(self, solver, path):
-        self._solver = solver
-        self._params = solver.params
+    def __init__(self, params, results, path):
+        self._params = params
+        self._results = results
         self._path = path
 
     def plot_geldart(self):
@@ -48,7 +48,7 @@ class PlotParameters:
         dp = self._params.bed['dp'] * 1e6
         dpmin = self._params.bed['dp_min'] * 1e6
         dpmax = self._params.bed['dp_max'] * 1e6
-        rhog = self._solver.gas.rho * 0.001
+        rhog = self._results['rhog'] * 0.001
         rhos = self._params.bed['rho'] * 0.001
         fig = cm.geldart_chart(dp, rhog, rhos, dpmin, dpmax)
         fig.savefig(f'{self._path}/fig_geldart.pdf')
@@ -57,14 +57,12 @@ class PlotParameters:
         """
         Plot intra-particle heat conduction at center and surface of biomass particle.
         """
-        biomass = self._solver.biomass
+        t_devol = self._results['tv']
+        t_ref = self._results['t_ref']
 
-        t_devol = biomass.t_devol
-        t_ref = biomass.t_ref
-
-        t = biomass.t
-        tk_center = biomass.tk[:, 0]
-        tk_surface = biomass.tk[:, -1]
+        t = self._results['t_hc']
+        tk_center = self._results['tk_hc'][:, 0]
+        tk_surface = self._results['tk_hc'][:, -1]
 
         fig, ax = plt.subplots(tight_layout=True)
         ax.plot(t, tk_center, label='center')
@@ -78,19 +76,15 @@ class PlotParameters:
     def plot_umb_umf_ut(self):
         """
         """
-        bed = self._solver.bed
-        bio = self._solver.biomass
-        bfb = self._solver.bfbreactor
+        us = self._results['us']
+        umb = self._results['umb']
+        umf_ergun = self._results['umf_ergun']
+        umf_wenyu = self._results['umf_wenyu']
 
-        us = bfb.us
-        umb = bed.umb
-        umf_ergun = bed.umf.ergun
-        umf_wenyu = bed.umf.wenyu
-
-        ut_bed_ganser = bed.ut.ganser
-        ut_bed_haider = bed.ut.haider
-        ut_bio_ganser = bio.ut.ganser
-        ut_bio_haider = bio.ut.haider
+        ut_bed_ganser = self._results['ut_bed_ganser']
+        ut_bed_haider = self._results['ut_bed_haider']
+        ut_bio_ganser = self._results['ut_bio_ganser']
+        ut_bio_haider = self._results['ut_bio_haider']
 
         gs = {'width_ratios': [1, 3]}
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10.4, 4.8), gridspec_kw=gs, tight_layout=True)

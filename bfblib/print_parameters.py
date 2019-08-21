@@ -58,14 +58,9 @@ def _params_string(pm):
     return textwrap.dedent(pm_string)
 
 
-def _results_string(solver):
+def _results_string(res):
     """
     """
-    gas = solver.gas
-    bed = solver.bed
-    bio = solver.biomass
-    bfb = solver.bfbreactor
-
     w = 12  # width specifier
 
     res_string = f"""
@@ -74,45 +69,43 @@ def _results_string(solver):
     {'*':*^40}
 
     {' Gas Properties ':-^40}\n
-    {'mw':<{w}} {gas.mw:<{w}.4f} Molecular weight [g/mol]
-    {'mu':<{w}} {gas.mu:<{w}.2f} Viscosity [µP]
-    {'rho':<{w}} {gas.rho:<{w}.4f} Density [kg/m³]
+    {'mw':<{w}} {res['mw']:<{w}.4f} Molecular weight [g/mol]
+    {'mu':<{w}} {res['mug']:<{w}.2f} Viscosity [µP]
+    {'rho':<{w}} {res['rhog']:<{w}.4f} Density [kg/m³]
 
     {' Bed Particle ':-^40}\n
-    {'umb':<{w}} {bed.umb:<{w}.4f} Minimum bubbling velocity [m/s]
-    {'umb_umf':{w}} {bed.umb_umf:<{w}.4f} Umb/Umf according to Abrahamsen [-]
-    {'umf_ergun':<{w}} {bed.umf.ergun:<{w}.4f} Minimum fluidization velocity [m/s]
-    {'umf_wenyu':<{w}} {bed.umf.wenyu:<{w}.4f} Minimum fluidization velocity [m/s]
-    {'ut_ganser':<{w}} {bed.ut.ganser:<{w}.2f} Terminal velocity [m/s]
-    {'ut_haider':<{w}} {bed.ut.haider:<{w}.2f} Terminal velocity [m/s]
+    {'umb':<{w}} {res['umb']:<{w}.4f} Minimum bubbling velocity [m/s]
+    {'umb_umf':{w}} {res['umb_umf']:<{w}.4f} Umb/Umf according to Abrahamsen [-]
+    {'umf_ergun':<{w}} {res['umf_ergun']:<{w}.4f} Minimum fluidization velocity [m/s]
+    {'umf_wenyu':<{w}} {res['umf_wenyu']:<{w}.4f} Minimum fluidization velocity [m/s]
+    {'ut_ganser':<{w}} {res['ut_bed_ganser']:<{w}.2f} Terminal velocity [m/s]
+    {'ut_haider':<{w}} {res['ut_bed_haider']:<{w}.2f} Terminal velocity [m/s]
 
     {' Biomass Particle ':-^40}\n
-    {'t_devol':<{w}} {bio.t_devol:<{w}.2f} Devolatilization time for 95% conversion [s]
-    {'t_ref':<{w}} {bio.t_ref:<{w}.2f} Time for particle center to reach T∞ [s]
-    {'umf_ergun':<{w}} {bio.umf.ergun:<{w}.4f} Minimum fluidization velocity [m/s]
-    {'umf_wenyu':<{w}} {bio.umf.wenyu:<{w}.4f} Minimum fluidization velocity [m/s]
-    {'ut_ganser':<{w}} {bio.ut.ganser:<{w}.2f} Terminal velocity [m/s]
-    {'ut_haider':<{w}} {bio.ut.haider:<{w}.2f} Terminal velocity [m/s]
+    {'t_devol':<{w}} {res['tv']:<{w}.2f} Devolatilization time for 95% conversion [s]
+    {'t_ref':<{w}} {res['t_ref']:<{w}.2f} Time for particle center to reach T∞ [s]
+    {'ut_ganser':<{w}} {res['ut_bio_ganser']:<{w}.2f} Terminal velocity [m/s]
+    {'ut_haider':<{w}} {res['ut_bio_haider']:<{w}.2f} Terminal velocity [m/s]
 
     {' BFB Reactor ':-^40}\n
-    {'ac':<{w}} {bfb.ac:<{w}.4f} Inner cross section area [m²]
-    {'us':<{w}} {bfb.us:<{w}.4f} Superficial gas velocity [m/s]
-    {'tdh_chan':<{w}} {bfb.tdh.chan:<{w}.4f} Transport disengaging height [m]
-    {'tdh_horio':<{w}} {bfb.tdh.horio:<{w}.4f} Transport disengaging height [m]
-    {'us_umf_ergun':<{w}} {bfb.us_umf.ergun:<{w}.2f} Us/Umf for gas and bed particles [-]
-    {'us_umf_wenyu':<{w}} {bfb.us_umf.wenyu:<{w}.2f} Us/Umf for gas and bed particles [-]
-    {'zexp_ergun':<{w}} {bfb.zexp.ergun:<{w}.2f} Height of expanded bed [m]
-    {'zexp_wenyu':<{w}} {bfb.zexp.wenyu:<{w}.2f} Height of expanded bed [m]
+    {'ac':<{w}} {res['ac']:<{w}.4f} Inner cross section area [m²]
+    {'us':<{w}} {res['us']:<{w}.4f} Superficial gas velocity [m/s]
+    {'tdh_chan':<{w}} {res['tdh_chan']:<{w}.4f} Transport disengaging height [m]
+    {'tdh_horio':<{w}} {res['tdh_horio']:<{w}.4f} Transport disengaging height [m]
+    {'us_umf_ergun':<{w}} {res['us_umf_ergun']:<{w}.2f} Us/Umf for gas and bed particles [-]
+    {'us_umf_wenyu':<{w}} {res['us_umf_wenyu']:<{w}.2f} Us/Umf for gas and bed particles [-]
+    {'zexp_ergun':<{w}} {res['zexp_ergun']:<{w}.2f} Height of expanded bed [m]
+    {'zexp_wenyu':<{w}} {res['zexp_wenyu']:<{w}.2f} Height of expanded bed [m]
     """
     return textwrap.dedent(res_string)
 
 
-def print_report(params, solver, path):
+def print_report(params, results, path):
     """
     Write parameters and results to text file for reporting purposes.
     """
     params_string = _params_string(params)
-    results_string = _results_string(solver)
+    results_string = _results_string(results)
 
     with open(path / 'report.txt', 'w') as f:
         print(params_string, file=f)

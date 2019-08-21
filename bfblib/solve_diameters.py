@@ -5,85 +5,72 @@ from particle import Particle
 from bfbreactor import BfbReactor
 
 
-class SolveDiameters:
+def solve_diameters(params):
+    """
+    Calculate results for gas, bed particle, biomass particle, and BFB reactor
+    for a range of particle diameters.
 
-    def __init__(self, params):
-        self.params = params
+    Parameters
+    ----------
+    params : module
+        Parameters from module file.
 
-        # calculated attributes
-        self.dps = None
-        self.us = None
-        self.umf_ergun = None
-        self.umf_wenyu = None
-        self.ut_bed_ganser = None
-        self.ut_bed_haider = None
-        self.ut_biomass_ganser = None
-        self.ut_biomass_haider = None
+    Returns
+    -------
+    results : dict
+        Results from calculations.
+    """
 
-    def calc_diameters(self, dpmin=0.00001, dpmax=0.001):
-        """
-        Range of particle diameters for solver calculations.
-        """
-        dps = np.linspace(dpmin, dpmax)
-        self.dps = dps
+    pm = params
 
-    def calc_us(self):
-        """
-        Calculate superficial gas velocity of BFB reactor.
-        """
-        pm = self.params
-        gas = Gas(pm.gas['sp'], pm.gas['x'], pm.gas['p'], pm.gas['tk'])
-        bfbreactor = BfbReactor(pm.reactor['di'], pm.reactor['q'], pm.reactor['zmf'])
-        bfbreactor.calc_us(gas)
-        self.us = bfbreactor.us
+    # Range of particle diameters for calculations
+    dpmin = 0.00001
+    dpmax = 0.001
+    dps = np.linspace(dpmin, dpmax)
 
-    def calc_umf(self):
-        """
-        """
-        pm = self.params
-        gas = Gas(pm.gas['sp'], pm.gas['x'], pm.gas['p'], pm.gas['tk'])
-        bed = Particle.from_params(pm.bed)
+    # Calculations
+    gas = Gas(pm.gas['sp'], pm.gas['x'], pm.gas['p'], pm.gas['tk'])
+    bed = Particle.from_params(pm.bed)
+    bio = Particle.from_params(pm.biomass)
+    bfb = BfbReactor(pm.reactor['di'], pm.reactor['q'], pm.reactor['zmf'])
 
-        ep = pm.reactor['ep']
-        umf_ergun = []
-        umf_wenyu = []
+    ep = pm.reactor['ep']
+    us = bfb.calc_us(gas)
 
-        for dp in self.dps:
-            bed.dp = dp
-            bed.calc_umf(ep, gas.mu, gas.rho)
-            umf_ergun.append(bed.umf.ergun)
-            umf_wenyu.append(bed.umf.wenyu)
+    umf_ergun = []
+    umf_wenyu = []
+    ut_bed_ganser = []
+    ut_bed_haider = []
+    ut_bio_ganser = []
+    ut_bio_haider = []
 
-        self.umf_ergun = umf_ergun
-        self.umf_wenyu = umf_wenyu
+    for dp in dps:
+        bed.dp = dp
+        bio.dp = dp
 
-    def calc_ut(self):
-        """
-        Calculate terminal velocity [m/s] for a range of bed and biomass
-        particle diameters.
-        """
-        pm = self.params
-        gas = Gas(pm.gas['sp'], pm.gas['x'], pm.gas['p'], pm.gas['tk'])
-        bed = Particle.from_params(pm.bed)
-        biomass = Particle.from_params(pm.biomass)
+        umfergun = bed.calc_umf_ergun(ep, gas)
+        umfwenyu = bed.calc_umf_wenyu(gas)
+        utbed_ganser = bed.calc_ut_ganser(gas)
+        utbed_haider = bed.calc_ut_haider(gas)
+        utbio_ganser = bio.calc_ut_ganser(gas)
+        utbio_haider = bio.calc_ut_haider(gas)
 
-        ut_bed_ganser = []
-        ut_bed_haider = []
-        ut_biomass_ganser = []
-        ut_biomass_haider = []
+        umf_ergun.append(umfergun)
+        umf_wenyu.append(umfwenyu)
+        ut_bed_ganser.append(utbed_ganser)
+        ut_bed_haider.append(utbed_haider)
+        ut_bio_ganser.append(utbio_ganser)
+        ut_bio_haider.append(utbio_haider)
 
-        for dp in self.dps:
-            bed.dp = dp
-            bed.calc_ut(gas.mu, gas.rho)
-            ut_bed_ganser.append(bed.ut.ganser)
-            ut_bed_haider.append(bed.ut.haider)
+    # Store results
+    results = {}
+    results['dps'] = dps
+    results['us'] = us
+    results['umf_ergun'] = umf_ergun
+    results['umf_wenyu'] = umf_wenyu
+    results['ut_bed_ganser'] = ut_bed_ganser
+    results['ut_bed_haider'] = ut_bed_haider
+    results['ut_bio_ganser'] = ut_bio_ganser
+    results['ut_bio_haider'] = ut_bio_haider
 
-            biomass.dp = dp
-            biomass.calc_ut(gas.mu, gas.rho)
-            ut_biomass_ganser.append(biomass.ut.ganser)
-            ut_biomass_haider.append(biomass.ut.haider)
-
-        self.ut_bed_ganser = ut_bed_ganser
-        self.ut_bed_haider = ut_bed_haider
-        self.ut_biomass_ganser = ut_biomass_ganser
-        self.ut_biomass_haider = ut_biomass_haider
+    return results

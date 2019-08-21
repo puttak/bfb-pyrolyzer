@@ -4,79 +4,52 @@ import logging
 import multiprocessing
 import pathlib
 
-from solve_parameters import SolveParameters
-from plot_parameters import PlotParameters
+from solve_parameters import solve_parameters
+from solve_diameters import solve_diameters
+from solve_temperatures import solve_temperatures
 from print_parameters import print_report
 
-from solve_diameters import SolveDiameters
+from plot_parameters import PlotParameters
 from plot_diameters import PlotDiameters
-
-from solve_temperatures import SolveTemperatures
 from plot_temperatures import PlotTemperatures
 
 
-def solve_parameters(path):
+def solve_params(params, path):
     """
     Perform calculations for parameters file.
     """
+
     logging.info('Solve for case parameters')
+    results = solve_parameters(params)
+    print_report(params, results, path)
 
-    spec = importlib.util.spec_from_file_location('params', path / 'params.py')
-    params = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(params)
-
-    solver = SolveParameters(params)
-    solver.calc_results()
-    print_report(params, solver, path)
-
-    plotter = PlotParameters(solver, path)
+    plotter = PlotParameters(params, results, path)
     plotter.plot_geldart()
     plotter.plot_intra_particle_heat_cond()
     plotter.plot_umb_umf_ut()
 
 
-def solve_diameters(path):
+def solve_diams(params, path):
     """
     Perform calculations for a range of particle sizes.
     """
     logging.info('Solve for diameters')
+    results = solve_diameters(params)
 
-    spec = importlib.util.spec_from_file_location('params', path / 'params.py')
-    params = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(params)
-
-    solver = SolveDiameters(params)
-    solver.calc_diameters()
-    solver.calc_us()
-    solver.calc_umf()
-    solver.calc_ut()
-
-    plotter = PlotDiameters(solver, path)
-    plotter.plot_umf_bed()
+    plotter = PlotDiameters(params, results, path)
+    plotter.plot_umf()
     plotter.plot_ut_bed()
-    plotter.plot_ut_biomass()
+    plotter.plot_ut_bio()
 
 
-def solve_temperatures(path):
+def solve_temps(params, path):
     """
+    Perform calculations for a range of temperatures.
     """
     logging.info('Solve for temperatures')
+    results = solve_temperatures(params)
 
-    spec = importlib.util.spec_from_file_location('params', path / 'params.py')
-    params = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(params)
-
-    solver = SolveTemperatures(params)
-    solver.get_temperatures()
-    solver.calc_tv()
-    solver.calc_us()
-    solver.calc_us_umf()
-    solver.calc_umb()
-    solver.calc_umb_umf()
-    solver.calc_umf()
-    solver.calc_ut()
-
-    plotter = PlotTemperatures(solver, path)
+    plotter = PlotTemperatures(params, results, path)
     plotter.plot_tv_temps()
     plotter.plot_umf_ratios_temps()
     plotter.plot_umb_umf_temps()
@@ -85,16 +58,18 @@ def solve_temperatures(path):
 
 def run_solvers(path):
     """
+    Run all solvers.
     """
-    solve_parameters(path)
-    solve_diameters(path)
-    solve_temperatures(path)
+    spec = importlib.util.spec_from_file_location('params', path / 'params.py')
+    params = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(params)
+
+    solve_params(params, path)
+    solve_diams(params, path)
+    solve_temps(params, path)
 
 
 def main():
-    """
-    Main entry point for program.
-    """
 
     # Command line arguments
     parser = argparse.ArgumentParser()

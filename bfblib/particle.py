@@ -1,6 +1,5 @@
 import chemics as cm
 import numpy as np
-from helpers import Umf, Ut
 from trans_heat_cond import hc2
 
 
@@ -24,10 +23,6 @@ class Particle:
         Time when particle is near reactor temperature [s]
     tk : array
         Intra-particle temperature [K]
-    umb : float
-        Minimum bubbling velocity [m/s]
-    umf : namedtuple
-        Minimum fluidization velocity [m/s]. Values available for `ergun` and `wenyu`.
     ut : namedtuple
         Terminal velocity [m/s]. Values available for `ganser` and `haider`.
     """
@@ -51,49 +46,66 @@ class Particle:
         rho = params['rho']
         return cls(dp, dp_min, dp_max, phi, rho)
 
-    def calc_umb(self, mug, rhog):
+    def calc_umb(self, gas):
         """
         Calculate minimum bubbling velocity [m/s] from Abrahamsen correlation.
         """
-        frac = 0.001        # wt. fraction of fines < 45 um
-        mug = mug * 1e-7    # convert to kg/ms = µP * 1e-7
-        umb = 2.07 * np.exp(0.716 * frac) * (self.dp * rhog**0.06) / (mug**0.347)
-        self.umb = umb
+        frac = 0.001            # wt. fraction of fines < 45 um
+        mug = gas.mu * 1e-7     # convert to kg/ms = µP * 1e-7
+        umb = 2.07 * np.exp(0.716 * frac) * (self.dp * gas.rho**0.06) / (mug**0.347)
+        return umb
 
-    def calc_umb_umf(self, mug, rhog):
+    def calc_umb_umf(self, gas):
         """
-        Calculate Umb/Umf according to the Abrahamsen paper. Note that Umf is
-        the Baeyens equation.
+        Calculate Umb/Umf [-] according to the Abrahamsen paper. Note that Umf
+        is based on the Baeyens equation.
         """
-        frac = 0.001        # wt. fraction of fines < 45 um
-        g = 9.81            # acceleration due to gravity [m/s²]
-        mug = mug * 1e-7    # convert to kg/ms = µP * 1e-7
+        frac = 0.001            # wt. fraction of fines < 45 um
+        g = 9.81                # acceleration due to gravity [m/s²]
+        mug = gas.mu * 1e-7     # convert to kg/ms = µP * 1e-7
         rhop = self.rho
 
-        x = 2300 * rhog**0.126 * mug**0.523 * np.exp(0.716 * frac)
-        y = self.dp**0.8 * g**0.934 * (rhop - rhog)**0.934
+        x = 2300 * gas.rho**0.126 * mug**0.523 * np.exp(0.716 * frac)
+        y = self.dp**0.8 * g**0.934 * (rhop - gas.rho)**0.934
         umb_umf = x / y
-        self.umb_umf = umb_umf
+        return umb_umf
 
-    def calc_umf(self, ep, mug, rhog):
+    def calc_umf_ergun(self, ep, gas):
         """
-        Calculate minimum fluidization velocity [m/s] of the particle.
+        Calculate minimum fluidization velocity [m/s] based on the Ergun
+        equation.
         """
-        mug = mug * 1e-7  # convert to kg/ms = µP * 1e-7
-        umf_ergun = cm.umf_ergun(self.dp, ep, mug, self.phi, rhog, self.rho)
-        umf_wenyu = cm.umf_coeff(self.dp, mug, rhog, self.rho, coeff='wenyu')
-        self.umf = Umf(umf_ergun, umf_wenyu)
+        mug = gas.mu * 1e-7     # convert to kg/ms = µP * 1e-7
+        umf_ergun = cm.umf_ergun(self.dp, ep, mug, self.phi, gas.rho, self.rho)
+        return umf_ergun
 
-    def calc_ut(self, mug, rhog):
+    def calc_umf_wenyu(self, gas):
+        """
+        Calculate minimum fluidization velocity [m/s] based on the Ergun
+        equation.
+        """
+        mug = gas.mu * 1e-7     # convert to kg/ms = µP * 1e-7
+        umf_wenyu = cm.umf_coeff(self.dp, mug, gas.rho, self.rho, coeff='wenyu')
+        return umf_wenyu
+
+    def calc_ut_ganser(self, gas):
         """
         Calculate terminal velocity [m/s] of the particle.
         """
-        mug = mug * 1e-7  # convert to kg/ms = µP * 1e-7
-        ut_ganser = cm.ut_ganser(self.dp, mug, self.phi, rhog, self.rho)
-        ut_haider = cm.ut_haider(self.dp, mug, self.phi, rhog, self.rho)
-        self.ut = Ut(ut_ganser, ut_haider)
+        mug = gas.mu * 1e-7     # convert to kg/ms = µP * 1e-7
+        ut_ganser = cm.ut_ganser(self.dp, mug, self.phi, gas.rho, self.rho)
+        return ut_ganser
 
-    def build_time_vector(self, nt, t_max):
+    def calc_ut_haider(self, gas):
+        """
+        Calculate terminal velocity [m/s] of the particle.
+        """
+        mug = gas.mu * 1e-7     # convert to kg/ms = µP * 1e-7
+        ut_haider = cm.ut_haider(self.dp, mug, self.phi, gas.rho, self.rho)
+        return ut_haider
+
+    @staticmethod
+    def build_time_vector(nt, t_max):
         """
         Times [s] for calculating transient heat conduction in biomass particle.
         """
@@ -101,9 +113,10 @@ class Particle:
         # dt is time step [s]
         # t is time vector [s]
         dt = t_max / nt
-        self.t = np.arange(0, t_max + dt, dt)
+        t_hc = np.arange(0, t_max + dt, dt)
+        return t_hc
 
-    def calc_trans_hc(self, b, h, k, m, mc, tki, tkinf):
+    def calc_trans_hc(self, b, h, k, m, mc, t, tki, tkinf):
         """
         Calculate intra-particle temperature profile [K] for biomass particle.
         """
@@ -111,15 +124,18 @@ class Particle:
         # rows = time step
         # columns = center to surface temperature
         sg = self.rho / 1000
-        self.tk = hc2(self.dp, mc, k, sg, h, tki, tkinf, b, m, self.t)
+        tk_hc = hc2(self.dp, mc, k, sg, h, tki, tkinf, b, m, t)
+        return tk_hc
 
-    def calc_time_tkinf(self, tkinf):
+    @staticmethod
+    def calc_time_tkinf(t_hc, tk_hc, tk_inf):
         """
         Time [s] when biomass particle is near reactor temperature.
         """
-        tk_ref = tkinf - 1                              # value near reactor temperature [K]
-        idx = np.where(self.tk[:, 0] > tk_ref)[0][0]    # index where T > Tinf
-        self.t_ref = self.t[idx]                        # time where T > Tinf
+        tk_ref = tk_inf - 1                             # value near reactor temperature [K]
+        idx = np.where(tk_hc[:, 0] > tk_ref)[0][0]      # index where T > Tinf
+        t_ref = t_hc[idx]                               # time where T > Tinf
+        return t_ref
 
     def calc_devol_time(self, tk):
         """
@@ -128,6 +144,7 @@ class Particle:
         dp = self.dp * 1000
         dp_min = self.dp_min * 1000
         dp_max = self.dp_max * 1000
-        self.t_devol = cm.devol_time(dp, tk)
-        self.t_devol_min = cm.devol_time(dp_min, tk)
-        self.t_devol_max = cm.devol_time(dp_max, tk)
+        tv = cm.devol_time(dp, tk)
+        tv_min = cm.devol_time(dp_min, tk)
+        tv_max = cm.devol_time(dp_max, tk)
+        return tv, tv_min, tv_max

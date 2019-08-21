@@ -1,11 +1,10 @@
 import chemics as cm
 import numpy as np
-from helpers import Tdh, UsUmf, Zexp
 
 
 class BfbReactor:
     """
-    Bubbling fluidized bed model.
+    Bubbling fluidized bed reactor model.
 
     Attributes
     ----------
@@ -15,14 +14,6 @@ class BfbReactor:
         Inner diameter of the reactor [m]
     q : float
         Volumetric flowrate of gas into reactor [SLM]
-    tdh : namedtuple
-        Transport disengaging height [m]. Values available for `chan` and `horio`.
-    us : float
-        Superficial gas velocity [m/s]
-    us_umf : namedtuple
-        Ratio of Us/Umf [-]. Values available for `ergun` and `wenyu`.
-    zexp : namedtuple
-        Expanded bed height [m]. Values available for `ergun` and `wenyu`.
     zmf : float
         Bed height at minimum fluidization [m]
     """
@@ -41,30 +32,43 @@ class BfbReactor:
         q_lpm = cm.slm_to_lpm(self.q, p_kpa, gas.tk)
         q_m3s = q_lpm / 60_000
         us = q_m3s / self.ac
-        self.us = us
+        return us
 
-    def calc_us_umf(self, bed):
+    @staticmethod
+    def calc_us_umf(us, umf):
         """
-        Calculate ratio of Us/Umf.
+        Calculate ratio of Us/Umf [-].
         """
-        us_umf_ergun = self.us / bed.umf.ergun
-        us_umf_wenyu = self.us / bed.umf.wenyu
-        self.us_umf = UsUmf(us_umf_ergun, us_umf_wenyu)
+        us_umf = us / umf
+        return us_umf
 
-    def calc_tdh(self):
+    @staticmethod
+    def calc_tdh_chan(us):
         """
-        Calculate transport disengaging height [m] from Chan and Horio correlations.
+        Calculate transport disengaging height [m] from Chan correlation.
         """
-        tdh_chan = cm.tdh_chan(self.us)
-        tdh_horio = cm.tdh_horio(self.di, self.us)
-        self.tdh = Tdh(tdh_chan, tdh_horio)
+        tdh_chan = cm.tdh_chan(us)
+        return tdh_chan
 
-    def calc_zexp(self, bed, gas):
+    def calc_tdh_horio(self, us):
         """
-        Calculate expanded bed height [m] from the bed expansion factor.
+        Calculate transport disengaging height [m] from Horio correlation.
         """
-        fbexp_ergun = cm.fbexp(self.di, bed.dp, gas.rho, bed.rho, bed.umf.ergun, self.us)
+        tdh_horio = cm.tdh_horio(self.di, us)
+        return tdh_horio
+
+    def calc_zexp_ergun(self, bed, gas, umf_ergun, us):
+        """
+        Calculate expanded bed height [m] based on Umf from Ergun equation.
+        """
+        fbexp_ergun = cm.fbexp(self.di, bed.dp, gas.rho, bed.rho, umf_ergun, us)
         zexp_ergun = self.zmf * fbexp_ergun
-        fbexp_wenyu = cm.fbexp(self.di, bed.dp, gas.rho, bed.rho, bed.umf.wenyu, self.us)
+        return zexp_ergun
+
+    def calc_zexp_wenyu(self, bed, gas, umf_wenyu, us):
+        """
+        Calculate expanded bed height [m] based on Umf from WenYu equation.
+        """
+        fbexp_wenyu = cm.fbexp(self.di, bed.dp, gas.rho, bed.rho, umf_wenyu, us)
         zexp_wenyu = self.zmf * fbexp_wenyu
-        self.zexp = Zexp(zexp_ergun, zexp_wenyu)
+        return zexp_wenyu

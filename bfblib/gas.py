@@ -79,11 +79,3 @@ class Gas:
             else:
                 raise ValueError(f'Viscosity equation `{self._eq}` not available.')
             self.mu = mu
-
-    def update_temperature(self, tk):
-        """
-        Update gas properties based on temperature.
-        """
-        self.tk = tk
-        self._calc_rho()
-        self._calc_mu()

@@ -34,22 +34,22 @@ def _config_axis(ax):
 
 class PlotTemperatures:
 
-    def __init__(self, solver, path):
-        self._solver = solver
-        self._params = solver.params
+    def __init__(self, params, results, path):
+        self._params = params
+        self._results = results
         self._path = path
 
     def plot_tv_temps(self):
         """
         Plot devolatilization time of a biomass particle.
         """
-        tks = self._solver.tks
-        t_devol = self._solver.tv
-        t_devol_min = self._solver.tv_min
-        t_devol_max = self._solver.tv_max
+        tks = self._results['tks']
+        t_devol = self._results['tv']
+        t_devol_min = self._results['tv_min']
+        t_devol_max = self._results['tv_max']
 
         x = np.arange(len(tks))   # x-axis label locations
-        width = 0.25                # width of the bars
+        width = 0.25              # width of the bars
 
         fig, ax = plt.subplots(tight_layout=True)
         bars_min = ax.bar(x, t_devol_min, width, color='lightgreen', label='dp_min')
@@ -73,12 +73,12 @@ class PlotTemperatures:
         """
         Plot Umf of bed particle for all cases.
         """
-        tks = self._solver.tks
-        umb = self._solver.umb
-        umf_ergun = self._solver.umf_ergun
-        umf_wenyu = self._solver.umf_wenyu
+        tks = self._results['tks']
+        umb = self._results['umb']
+        umf_ergun = self._results['umf_ergun']
+        umf_wenyu = self._results['umf_wenyu']
 
-        x = np.arange(len(tks))   # x-axis label locations
+        x = np.arange(len(tks))     # x-axis label locations
         width = 0.25                # width of the bars
 
         fig, ax = plt.subplots(tight_layout=True)
@@ -105,19 +105,19 @@ class PlotTemperatures:
         """
         Plot terminal velocity for a range of temperatures.
         """
-        temps = self._solver.tks
-        us = self._solver.us
-        ut_bed_ganser = self._solver.ut_bed_ganser
-        ut_bed_haider = self._solver.ut_bed_haider
-        ut_bio_ganser = self._solver.ut_biomass_ganser
-        ut_bio_haider = self._solver.ut_biomass_haider
+        temps = self._results['tks']
+        us = self._results['us']
+        ut_bed_ganser = self._results['ut_bed_ganser']
+        ut_bed_haider = self._results['ut_bed_haider']
+        ut_bio_ganser = self._results['ut_bio_ganser']
+        ut_bio_haider = self._results['ut_bio_haider']
 
         fig, (ax1, ax2) = plt.subplots(1, 2, tight_layout=True)
 
         ln1, = ax1.plot(temps, ut_bed_ganser, 'k--', marker='.')
         ln2, = ax1.plot(temps, ut_bed_haider, 'k-', marker='.')
+        ln3, = ax1.plot(temps, us, 'r', marker='.')
         f1 = ax1.fill_between(temps, ut_bed_ganser, ut_bed_haider, color='tan', label='bed')
-        ln3 = ax1.axhline(us, color='r')
         ax1.set_xticks([int(x) for x in temps])
         ax1.set_xlabel('Temperature [K]')
         ax1.set_ylabel('Terminal velocity [m/s]')
@@ -125,8 +125,8 @@ class PlotTemperatures:
 
         ax2.plot(temps, ut_bio_ganser, 'k--', marker='.')
         ax2.plot(temps, ut_bio_haider, 'k-', marker='.')
+        ax2.plot(temps, us, 'r', marker='.')
         f2 = ax2.fill_between(temps, ut_bio_ganser, ut_bio_haider, color='forestgreen', label='biomass')
-        ax2.axhline(us, color='r', label='Us')
         ax2.set_xticks([int(x) for x in temps])
         ax2.set_xlabel('Temperature [K]')
         ax2.legend([ln1, ln2, ln3, f1, f2], ['Ganser', 'Haider', 'Us', 'bed', 'biomass'], loc='center left', bbox_to_anchor=(1, 0.5), frameon=False)
@@ -137,10 +137,10 @@ class PlotTemperatures:
     def plot_umf_ratios_temps(self):
         """
         """
-        temps = self._solver.tks
-        umb_umf = self._solver.umb_umf
-        us_umf_ergun = self._solver.us_umf_ergun
-        us_umf_wenyu = self._solver.us_umf_wenyu
+        temps = self._results['tks']
+        umb_umf = self._results['umb_umf']
+        us_umf_ergun = self._results['us_umf_ergun']
+        us_umf_wenyu = self._results['us_umf_wenyu']
 
         x = np.arange(len(temps))   # x-axis label locations
         width = 0.25                # width of the bars
